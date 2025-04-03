@@ -1,0 +1,75 @@
+# Rust project 
+# Trading bot for Crypto & Stocks.
+
+#Tentative milestones:
+- API from Binance data ( check limits or cost )
+- DB for storing data and use it for backtesting & strategies 
+    - PostgreSQL + TimescaleDB: The Best Local Setup for Time-Series Data
+- First iteration will be with Crypto values
+
+
+# Structure of the deployemnt ( tentative )
+stock_pred/
+├── src/
+│   ├── main.rs                # Entry point
+│   ├── config.rs              # Configuration management
+│   ├── logging.rs             # Logging setup
+│   ├── db.rs                  # Database connection & operations
+│   ├── data/                  
+│   │   ├── mod.rs             # Data module
+│   │   ├── stocks.rs          # Fetch stock data
+│   │   ├── crypto.rs          # Fetch crypto data
+│   ├── trading/
+│   │   ├── mod.rs             # Trading module
+│   │   ├── execution.rs       # Trade execution logic
+│   │   ├── market_orders.rs   # Market order execution
+│   │   ├── limit_orders.rs    # Limit order execution
+│   │   ├── risk_management.rs # Risk controls (stop-loss, exposure limits)
+│   │   ├── tracking.rs        # Track open trades
+│   │   ├── strategies/        # Trading strategies
+│   │   │   ├── mod.rs         # Strategies module
+│   │   │   ├── mean_reversion.rs # Mean reversion strategy
+│   │   │   ├── momentum.rs    # Momentum trading strategy
+│   │   │   ├── arbitrage.rs   # Arbitrage trading strategy
+│   │   ├── backtesting.rs     # Backtesting engine
+│   │   ├── account.rs         # Account balance tracking
+│   │   ├── trade_history.rs   # Store past trades
+│   ├── web/
+│   │   ├── mod.rs             # Web module
+│   │   ├── server.rs          # Web dashboard (Axum API)
+│   │   ├── routes.rs          # API routes
+│   ├── performance/           # Performance monitoring module
+│   │   ├── mod.rs             # Expose performance functions
+│   │   ├── latency.rs         # Trade execution speed analysis
+│   │   ├── risk.rs            # Real-time risk exposure tracking
+│   │   ├── slippage.rs        # Slippage tracking vs. order book depth
+│   │   ├── pnl.rs             # Compute profit & loss (PnL) metrics
+│   ├── utils.rs               # Helper functions
+│   ├── errors.rs              # Error handling
+│   ├── tasks/                 # Threaded background workers
+│   │   ├── mod.rs             # Background task manager
+│   │   ├── data_fetcher.rs    # Fetch stock/crypto data (threaded)
+│   │   ├── strategy_runner.rs # Apply strategies on data (threaded)
+│   │   ├── balance_tracker.rs # Manage funds/balance updates (threaded)
+│   │   ├── trade_executor.rs  # Execute trades (threaded)
+│   ├── api/
+│   │   ├── mod.rs             # API integration module
+│   │   ├── yahoo.rs           # Yahoo Finance API integration
+│   │   ├── binance.rs         # Binance API integration
+│   │   ├── coinbase.rs        # Coinbase API integration
+│   │   ├── kraken.rs          # Kraken API integration
+│   ├── profiling/             # Performance profiling module
+│   │   ├── mod.rs             # Performance monitoring module
+│   │   ├── latency.rs         # Measure execution latency
+│   │   ├── tracing.rs         # Real-time logging & tracing
+│   │   ├── flamegraph.rs      # CPU profiling
+│   │   ├── pprof.rs           # Memory & CPU profiling
+│   ├── tests/                 # Unit & integration tests
+│   │   ├── mod.rs             # Test module
+│   │   ├── trading_tests.rs   # Tests for trading logic
+│   │   ├── strategy_tests.rs  # Tests for trading strategies
+│   │   ├── db_tests.rs        # Tests for database transactions
+│   │   ├── api_tests.rs       # Tests for web APIs
+│   ├── lib.rs                 # Library interface
+├── .env                       # Environment variables
+├── Cargo.toml                  # Dependencies & metadata
