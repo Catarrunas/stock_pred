@@ -2,7 +2,6 @@ use std::error::Error;
 use serde_json::Value;
 use stock_pred::api::binance::Binance;
 use tokio::time::{sleep, Duration};
-use clap::Parser;
 
 /// Enum to indicate the type of trend.
 #[derive(Debug, Clone, Copy)]
@@ -183,55 +182,4 @@ pub async fn backtest_trade(
     };
 
     Ok((final_multiplier, trades))
-}
-
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// The trading pair (e.g. FARMUSDT)
-    token: String,
-    /// The kline interval (e.g. 1h, 15m)
-    interval: String,
-    /// The number of candles to fetch (e.g. 48)
-    limit: u16,
-    /// Trend type: "positive" or "negative"
-    trend: String,
-    /// The stop loss percentage to simulate (e.g. 5 for 5%)
-    stop_loss: f64,
-}
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    let args = Args::parse();
-    let binance = Binance::new();
-    let trend = TrendType::from_str(&args.trend);
-
-    println!(
-        "Running backtest for {} over {} candles with interval {} for {:?} trend and stop loss {}%...",
-        args.token, args.limit, args.interval, trend, args.stop_loss
-    );
-
-    match backtest_trade(&binance, &args.token, &args.interval, args.limit, args.stop_loss, trend).await {
-        Ok((multiplier, trades)) => {
-            let total_profit = (multiplier - 1.0) * 100.0;
-            println!("Backtest result: Final multiplier = {:.4} (Total Profit: {:+.2}%)", multiplier, total_profit);
-            println!("Trade details:");
-            for trade in trades {
-                match trade.exit_index {
-                    Some(idx) => println!(
-                        "  Trade from candle {}: entry at {:.2}, exit at {:.2}, multiplier: {:.4}",
-                        trade.entry_index + 1, trade.entry_price, trade.exit_price, trade.multiplier
-                    ),
-                    None => println!(
-                        "  Final trade starting at candle {}: entry at {:.2}, exit at {:.2} (final), multiplier: {:.4}",
-                        trade.entry_index + 1, trade.entry_price, trade.exit_price, trade.multiplier
-                    ),
-                }
-            }
-        },
-        Err(e) => eprintln!("Backtest error: {}", e),
-    }
-
-    sleep(Duration::from_secs(1)).await;
-    Ok(())
 }

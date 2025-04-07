@@ -1,0 +1,220 @@
+2025-04-07T08:44:43.796644Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T08:44:43.800412Z  INFO main ThreadId(01) Assets to scan: ["USDC", "BUSD", "BTC"]
+2025-04-07T08:44:43.801416Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-07 08:44:43] Running stop loss update loop
+2025-04-07T08:44:43.801436Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 08:44:43] Starting market check iteration...
+2025-04-07T08:44:44.180977Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 135 tokens with positive 24r hours change
+2025-04-07T08:44:44.181027Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T08:44:44.434460Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T08:44:44.434694Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 13 filtered tokens
+2025-04-07T08:44:47.915018Z  INFO tokio-runtime-worker ThreadId(04) Processing asset: BUSD
+2025-04-07T08:44:48.169131Z  INFO tokio-runtime-worker ThreadId(12) Asset: BUSD has balance: 0
+2025-04-07T08:44:48.169313Z  INFO tokio-runtime-worker ThreadId(12) Balance for BUSD ($0.00) is below the required transaction amount ($20.00). Skipping asset.
+2025-04-07T08:44:48.169374Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: BTC
+2025-04-07T08:44:48.423383Z  INFO tokio-runtime-worker ThreadId(04) Asset: BTC has balance: 0
+2025-04-07T08:44:48.423511Z  INFO tokio-runtime-worker ThreadId(04) Balance for BTC ($0.00) is below the required transaction amount ($20.00). Skipping asset.
+2025-04-07T08:44:48.423573Z  INFO tokio-runtime-worker ThreadId(04) Sleeping for 600 seconds before the next iteration...
+2025-04-07T09:02:47.485498Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:02:47.490318Z  INFO main ThreadId(01) Assets to scan: ["USDC", "BUSD", "BTC"]
+2025-04-07T09:02:47.490483Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:02:47] Starting market check iteration...
+2025-04-07T09:02:47.490493Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 09:02:47] Running stop loss update loop
+2025-04-07T09:02:48.284167Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 128 tokens with positive 24r hours change
+2025-04-07T09:02:48.284200Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:02:48.532611Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:02:48.532668Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 12 filtered tokens
+2025-04-07T09:02:51.513888Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: BUSD
+2025-04-07T09:02:51.771405Z  INFO tokio-runtime-worker ThreadId(02) Asset: BUSD has balance: 0
+2025-04-07T09:02:51.771495Z  INFO tokio-runtime-worker ThreadId(02) Balance for BUSD ($0.00) is below the required transaction amount ($20.00). Skipping asset.
+2025-04-07T09:02:51.771528Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: BTC
+2025-04-07T09:02:52.024240Z  INFO tokio-runtime-worker ThreadId(02) Asset: BTC has balance: 0
+2025-04-07T09:02:52.024324Z  INFO tokio-runtime-worker ThreadId(02) Balance for BTC ($0.00) is below the required transaction amount ($0.00). Skipping asset.
+2025-04-07T09:02:52.024363Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:03:52.262027Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:03:52.266189Z  INFO main ThreadId(01) Assets to scan: ["USDC", "BUSD", "BTC"]
+2025-04-07T09:03:52.266349Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:03:52] Running stop loss update loop
+2025-04-07T09:03:52.266364Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-07 09:03:52] Starting market check iteration...
+2025-04-07T09:03:52.843268Z  INFO tokio-runtime-worker ThreadId(13) Filtered tokens: 128 tokens with positive 24r hours change
+2025-04-07T09:03:52.843312Z  INFO tokio-runtime-worker ThreadId(13) Processing asset: USDC
+2025-04-07T09:03:53.093171Z  INFO tokio-runtime-worker ThreadId(13) Asset: USDC has balance: 101.70637811
+2025-04-07T09:03:53.093295Z  INFO tokio-runtime-worker ThreadId(13) Asset USDC have 12 filtered tokens
+2025-04-07T09:03:56.086625Z  INFO tokio-runtime-worker ThreadId(03) Processing asset: BUSD
+2025-04-07T09:03:56.333237Z  INFO tokio-runtime-worker ThreadId(13) Asset: BUSD has balance: 0
+2025-04-07T09:03:56.333284Z  INFO tokio-runtime-worker ThreadId(13) Balance for BUSD ($0.00) is below the required transaction amount ($20.00). Skipping asset.
+2025-04-07T09:03:56.333301Z  INFO tokio-runtime-worker ThreadId(13) Processing asset: BTC
+2025-04-07T09:03:56.584058Z  INFO tokio-runtime-worker ThreadId(03) Asset: BTC has balance: 0
+2025-04-07T09:03:56.584131Z  INFO tokio-runtime-worker ThreadId(03) Balance for BTC ($0.00) is below the required transaction amount ($0.00). Skipping asset.
+2025-04-07T09:03:56.584187Z  INFO tokio-runtime-worker ThreadId(03) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:04:27.531594Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:04:27.535778Z  INFO main ThreadId(01) Assets to scan: ["USDC", "BUSD", "BTC"]
+2025-04-07T09:04:27.535944Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:04:27] Starting market check iteration...
+2025-04-07T09:04:27.535991Z  INFO tokio-runtime-worker ThreadId(10) [2025-04-07 09:04:27] Running stop loss update loop
+2025-04-07T09:04:28.327726Z  INFO tokio-runtime-worker ThreadId(10) Filtered tokens: 127 tokens with positive 24r hours change
+2025-04-07T09:04:28.327754Z  INFO tokio-runtime-worker ThreadId(10) Processing asset: USDC
+2025-04-07T09:04:28.574886Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:04:28.574939Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 12 filtered tokens
+2025-04-07T09:04:31.576383Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: BUSD
+2025-04-07T09:04:31.833957Z  INFO tokio-runtime-worker ThreadId(10) Asset: BUSD has balance: 0
+2025-04-07T09:04:31.834157Z  INFO tokio-runtime-worker ThreadId(10) Balance for BUSD ($0.00) is below the required transaction amount ($20.00). Skipping asset.
+2025-04-07T09:04:31.834244Z  INFO tokio-runtime-worker ThreadId(10) Processing asset: BTC
+2025-04-07T09:04:32.087461Z  INFO tokio-runtime-worker ThreadId(10) Asset: BTC has balance: 0
+2025-04-07T09:04:32.087567Z  INFO tokio-runtime-worker ThreadId(10) Balance for BTC ($0.00) is below the required transaction amount ($0.00). Skipping asset.
+2025-04-07T09:04:32.087619Z  INFO tokio-runtime-worker ThreadId(10) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:05:28.702220Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:05:28.705759Z  INFO main ThreadId(01) Assets to scan: ["USDC", "USDT"]
+2025-04-07T09:05:28.705939Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:05:28] Starting market check iteration...
+2025-04-07T09:05:28.705956Z  INFO tokio-runtime-worker ThreadId(09) [2025-04-07 09:05:28] Running stop loss update loop
+2025-04-07T09:05:29.501448Z  INFO tokio-runtime-worker ThreadId(09) Filtered tokens: 124 tokens with positive 24r hours change
+2025-04-07T09:05:29.501486Z  INFO tokio-runtime-worker ThreadId(09) Processing asset: USDC
+2025-04-07T09:05:29.752777Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:05:29.752906Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 11 filtered tokens
+2025-04-07T09:05:32.491546Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:05:32.746584Z  INFO tokio-runtime-worker ThreadId(09) Asset: USDT has balance: 0
+2025-04-07T09:05:32.746784Z  INFO tokio-runtime-worker ThreadId(09) Asset USDT have 16 filtered tokens
+2025-04-07T09:05:33.993168Z  INFO tokio-runtime-worker ThreadId(12) 🚀 FORTHUSDT is pumping with 14.19% overall growth in the last 24 hours and 0.61% growth in the last 4 hours!
+2025-04-07T09:05:33.993338Z  INFO tokio-runtime-worker ThreadId(12) For token FORTHUSDT: Average raw fluctuation: 0.2294, Average percent fluctuation: 10.18%
+2025-04-07T09:05:36.739168Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:07:24.055457Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:07:24.059332Z  INFO main ThreadId(01) Assets to scan: ["USDC", "USDT"]
+2025-04-07T09:07:24.059486Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:07:24] Starting market check iteration...
+2025-04-07T09:07:24.059506Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-07 09:07:24] Running stop loss update loop
+2025-04-07T09:07:25.092616Z  INFO tokio-runtime-worker ThreadId(11) Filtered tokens: 125 tokens with positive 24r hours change
+2025-04-07T09:07:25.092646Z  INFO tokio-runtime-worker ThreadId(11) Processing asset: USDC
+2025-04-07T09:07:25.348972Z  INFO tokio-runtime-worker ThreadId(11) Asset: USDC has balance: 101.70637811
+2025-04-07T09:07:25.349176Z  INFO tokio-runtime-worker ThreadId(11) Asset USDC have 11 filtered tokens
+2025-04-07T09:07:28.091959Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:07:28.344235Z  INFO tokio-runtime-worker ThreadId(11) Asset: USDT has balance: 0
+2025-04-07T09:07:28.344396Z  INFO tokio-runtime-worker ThreadId(11) Asset USDT have 16 filtered tokens
+2025-04-07T09:07:29.588344Z  INFO tokio-runtime-worker ThreadId(10) 🚀 FORTHUSDT is pumping with 13.94% overall growth in the last 24 hours and 0.39% growth in the last 4 hours!
+2025-04-07T09:07:29.588479Z  INFO tokio-runtime-worker ThreadId(10) For token FORTHUSDT: Average raw fluctuation: 0.2294, Average percent fluctuation: 10.18%
+2025-04-07T09:07:32.332840Z  INFO tokio-runtime-worker ThreadId(10) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:18:29.697854Z  INFO main ThreadId(01) Application started with logging!
+2025-04-07T09:18:29.701701Z  INFO main ThreadId(01) Assets to scan: ["USDC", "USDT"]
+2025-04-07T09:18:29.701855Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 09:18:29] Starting market check iteration...
+2025-04-07T09:18:29.701874Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-07 09:18:29] Running stop loss update loop
+2025-04-07T09:18:30.982635Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 121 tokens with positive 24r hours change
+2025-04-07T09:18:30.982702Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:18:31.235241Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:18:31.235498Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 9 filtered tokens
+2025-04-07T09:18:33.481285Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDT
+2025-04-07T09:18:33.737268Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDT has balance: 0
+2025-04-07T09:18:33.737486Z  INFO tokio-runtime-worker ThreadId(02) Asset USDT have 16 filtered tokens
+2025-04-07T09:18:34.978924Z  INFO tokio-runtime-worker ThreadId(12) 🚀 FORTHUSDT is pumping with 13.99% overall growth in the last 24 hours and 0.44% growth in the last 4 hours!
+2025-04-07T09:18:34.979115Z  INFO tokio-runtime-worker ThreadId(12) For token FORTHUSDT: Average raw fluctuation: 0.2303, Average percent fluctuation: 10.22%
+2025-04-07T09:18:37.719412Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:19:37.721419Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 09:19:37] Starting market check iteration...
+2025-04-07T09:19:39.450806Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 116 tokens with positive 24r hours change
+2025-04-07T09:19:39.450865Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:19:39.700323Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:19:39.700458Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 6 filtered tokens
+2025-04-07T09:19:41.197180Z  INFO tokio-runtime-worker ThreadId(08) Processing asset: USDT
+2025-04-07T09:19:41.451272Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDT has balance: 0
+2025-04-07T09:19:41.451500Z  INFO tokio-runtime-worker ThreadId(08) Asset USDT have 14 filtered tokens
+2025-04-07T09:19:42.449639Z  INFO tokio-runtime-worker ThreadId(02) 🚀 FORTHUSDT is pumping with 16.04% overall growth in the last 24 hours and 2.24% growth in the last 4 hours!
+2025-04-07T09:19:42.449807Z  INFO tokio-runtime-worker ThreadId(02) For token FORTHUSDT: Average raw fluctuation: 0.2321, Average percent fluctuation: 10.30%
+2025-04-07T09:19:44.931915Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:20:44.935004Z  INFO tokio-runtime-worker ThreadId(02) [2025-04-07 09:20:44] Starting market check iteration...
+2025-04-07T09:20:45.473869Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 124 tokens with positive 24r hours change
+2025-04-07T09:20:45.473905Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:20:45.728427Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDC has balance: 101.70637811
+2025-04-07T09:20:45.728609Z  INFO tokio-runtime-worker ThreadId(02) Asset USDC have 10 filtered tokens
+2025-04-07T09:20:48.322892Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDT
+2025-04-07T09:20:48.575596Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDT has balance: 0
+2025-04-07T09:20:48.575773Z  INFO tokio-runtime-worker ThreadId(12) Asset USDT have 16 filtered tokens
+2025-04-07T09:20:49.612550Z  INFO tokio-runtime-worker ThreadId(02) 🚀 FORTHUSDT is pumping with 18.87% overall growth in the last 24 hours and 4.74% growth in the last 4 hours!
+2025-04-07T09:20:49.612710Z  INFO tokio-runtime-worker ThreadId(02) For token FORTHUSDT: Average raw fluctuation: 0.2345, Average percent fluctuation: 10.40%
+2025-04-07T09:20:52.729613Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:21:52.732347Z  INFO tokio-runtime-worker ThreadId(02) [2025-04-07 09:21:52] Starting market check iteration...
+2025-04-07T09:21:54.316555Z  INFO tokio-runtime-worker ThreadId(02) Filtered tokens: 118 tokens with positive 24r hours change
+2025-04-07T09:21:54.316595Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDC
+2025-04-07T09:21:54.579641Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:21:54.579823Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 8 filtered tokens
+2025-04-07T09:21:56.740649Z  INFO tokio-runtime-worker ThreadId(08) Processing asset: USDT
+2025-04-07T09:21:56.996606Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDT has balance: 0
+2025-04-07T09:21:56.996808Z  INFO tokio-runtime-worker ThreadId(08) Asset USDT have 13 filtered tokens
+2025-04-07T09:21:57.852117Z  INFO tokio-runtime-worker ThreadId(02) 🚀 FORTHUSDT is pumping with 20.77% overall growth in the last 24 hours and 6.41% growth in the last 4 hours!
+2025-04-07T09:21:57.852339Z  INFO tokio-runtime-worker ThreadId(02) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:22:00.546556Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:23:00.548237Z  INFO tokio-runtime-worker ThreadId(02) [2025-04-07 09:23:00] Starting market check iteration...
+2025-04-07T09:23:01.552354Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 122 tokens with positive 24r hours change
+2025-04-07T09:23:01.552393Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:23:01.853228Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDC has balance: 101.70637811
+2025-04-07T09:23:01.853374Z  INFO tokio-runtime-worker ThreadId(02) Asset USDC have 9 filtered tokens
+2025-04-07T09:23:04.307165Z  INFO tokio-runtime-worker ThreadId(08) Processing asset: USDT
+2025-04-07T09:23:04.561685Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDT has balance: 0
+2025-04-07T09:23:04.561930Z  INFO tokio-runtime-worker ThreadId(02) Asset USDT have 15 filtered tokens
+2025-04-07T09:23:05.811192Z  INFO tokio-runtime-worker ThreadId(12) 🚀 FORTHUSDT is pumping with 19.37% overall growth in the last 24 hours and 5.18% growth in the last 4 hours!
+2025-04-07T09:23:05.811350Z  INFO tokio-runtime-worker ThreadId(12) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:23:08.451010Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:24:08.454309Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 09:24:08] Starting market check iteration...
+2025-04-07T09:24:09.227134Z  INFO tokio-runtime-worker ThreadId(02) Filtered tokens: 123 tokens with positive 24r hours change
+2025-04-07T09:24:09.227189Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDC
+2025-04-07T09:24:09.479086Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:24:09.479235Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 8 filtered tokens
+2025-04-07T09:24:11.555577Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:24:11.884527Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDT has balance: 0
+2025-04-07T09:24:11.884679Z  INFO tokio-runtime-worker ThreadId(02) Asset USDT have 17 filtered tokens
+2025-04-07T09:24:13.325650Z  INFO tokio-runtime-worker ThreadId(12) 🚀 FORTHUSDT is pumping with 20.42% overall growth in the last 24 hours and 6.10% growth in the last 4 hours!
+2025-04-07T09:24:13.325880Z  INFO tokio-runtime-worker ThreadId(12) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:24:16.706214Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:25:16.709476Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 09:25:16] Starting market check iteration...
+2025-04-07T09:25:17.479278Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 122 tokens with positive 24r hours change
+2025-04-07T09:25:17.479335Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:25:17.738982Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:25:17.739182Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 9 filtered tokens
+2025-04-07T09:25:20.096196Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:25:20.352644Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDT has balance: 0
+2025-04-07T09:25:20.352822Z  INFO tokio-runtime-worker ThreadId(12) Asset USDT have 14 filtered tokens
+2025-04-07T09:25:21.113530Z  INFO tokio-runtime-worker ThreadId(08) 🚀 FORTHUSDT is pumping with 21.96% overall growth in the last 24 hours and 7.46% growth in the last 4 hours!
+2025-04-07T09:25:21.113740Z  INFO tokio-runtime-worker ThreadId(08) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:25:24.292217Z  INFO tokio-runtime-worker ThreadId(08) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:26:24.296063Z  INFO tokio-runtime-worker ThreadId(08) [2025-04-07 09:26:24] Starting market check iteration...
+2025-04-07T09:26:25.070967Z  INFO tokio-runtime-worker ThreadId(12) Filtered tokens: 123 tokens with positive 24r hours change
+2025-04-07T09:26:25.071005Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDC
+2025-04-07T09:26:25.324245Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:26:25.324341Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 9 filtered tokens
+2025-04-07T09:26:27.920333Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:26:28.186907Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDT has balance: 0
+2025-04-07T09:26:28.187030Z  INFO tokio-runtime-worker ThreadId(12) Asset USDT have 15 filtered tokens
+2025-04-07T09:26:29.310555Z  INFO tokio-runtime-worker ThreadId(02) 🚀 FORTHUSDT is pumping with 20.82% overall growth in the last 24 hours and 6.45% growth in the last 4 hours!
+2025-04-07T09:26:29.310702Z  INFO tokio-runtime-worker ThreadId(02) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:26:32.280945Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:27:32.284052Z  INFO tokio-runtime-worker ThreadId(02) [2025-04-07 09:27:32] Starting market check iteration...
+2025-04-07T09:27:33.058625Z  INFO tokio-runtime-worker ThreadId(02) Filtered tokens: 123 tokens with positive 24r hours change
+2025-04-07T09:27:33.058681Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDC
+2025-04-07T09:27:33.410979Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:27:33.411033Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 9 filtered tokens
+2025-04-07T09:27:35.654784Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDT
+2025-04-07T09:27:35.911664Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDT has balance: 0
+2025-04-07T09:27:35.911866Z  INFO tokio-runtime-worker ThreadId(12) Asset USDT have 14 filtered tokens
+2025-04-07T09:27:36.659481Z  INFO tokio-runtime-worker ThreadId(08) 🚀 FORTHUSDT is pumping with 21.91% overall growth in the last 24 hours and 7.42% growth in the last 4 hours!
+2025-04-07T09:27:36.659638Z  INFO tokio-runtime-worker ThreadId(08) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:27:39.410437Z  INFO tokio-runtime-worker ThreadId(08) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:28:39.413336Z  INFO tokio-runtime-worker ThreadId(08) [2025-04-07 09:28:39] Starting market check iteration...
+2025-04-07T09:28:40.189910Z  INFO tokio-runtime-worker ThreadId(02) Filtered tokens: 120 tokens with positive 24r hours change
+2025-04-07T09:28:40.189976Z  INFO tokio-runtime-worker ThreadId(02) Processing asset: USDC
+2025-04-07T09:28:40.484122Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDC has balance: 101.70637811
+2025-04-07T09:28:40.484192Z  INFO tokio-runtime-worker ThreadId(12) Asset USDC have 8 filtered tokens
+2025-04-07T09:28:42.824776Z  INFO tokio-runtime-worker ThreadId(08) Processing asset: USDT
+2025-04-07T09:28:43.081394Z  INFO tokio-runtime-worker ThreadId(02) Asset: USDT has balance: 0
+2025-04-07T09:28:43.081574Z  INFO tokio-runtime-worker ThreadId(02) Asset USDT have 14 filtered tokens
+2025-04-07T09:28:44.272874Z  INFO tokio-runtime-worker ThreadId(12) 🚀 FORTHUSDT is pumping with 20.27% overall growth in the last 24 hours and 5.97% growth in the last 4 hours!
+2025-04-07T09:28:44.273103Z  INFO tokio-runtime-worker ThreadId(12) For token FORTHUSDT: Average raw fluctuation: 0.2380, Average percent fluctuation: 10.56%
+2025-04-07T09:28:47.032122Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 60 seconds before the next iteration...
+2025-04-07T09:29:47.034599Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 09:29:47] Starting market check iteration...
+2025-04-07T09:29:47.805009Z  INFO tokio-runtime-worker ThreadId(08) Filtered tokens: 124 tokens with positive 24r hours change
+2025-04-07T09:29:47.805045Z  INFO tokio-runtime-worker ThreadId(08) Processing asset: USDC
+2025-04-07T09:29:48.055364Z  INFO tokio-runtime-worker ThreadId(08) Asset: USDC has balance: 101.70637811
+2025-04-07T09:29:48.055487Z  INFO tokio-runtime-worker ThreadId(08) Asset USDC have 9 filtered tokens
+2025-04-07T09:29:50.492112Z  INFO tokio-runtime-worker ThreadId(12) Processing asset: USDT
+2025-04-07T09:29:50.746540Z  INFO tokio-runtime-worker ThreadId(12) Asset: USDT has balance: 0
+2025-04-07T09:29:50.746689Z  INFO tokio-runtime-worker ThreadId(12) Asset USDT have 15 filtered tokens
+2025-04-07T16:09:45.731846Z  INFO main ThreadId(01) Negative trend monitor started with logging!
+2025-04-07T16:09:45.735689Z  INFO main ThreadId(01) Assets to scan: ["USDC"]
+2025-04-07T16:09:45.735833Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-07 16:09:45] Starting market check iteration for negative trends...
+2025-04-07T16:09:45.735840Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-07 16:09:45] Running stop loss update loop
+2025-04-07T16:09:46.303786Z  INFO tokio-runtime-worker ThreadId(11) Filtered tokens: 1141 tokens with negative 24hr change
+2025-04-07T16:09:46.303824Z  INFO tokio-runtime-worker ThreadId(11) Processing asset: USDC
+2025-04-07T16:09:46.551991Z  INFO tokio-runtime-worker ThreadId(09) Asset: USDC has balance: 101.70637811
+2025-04-07T16:09:46.552136Z  INFO tokio-runtime-worker ThreadId(09) Asset USDC has 150 filtered tokens
+2025-04-07T16:10:18.331120Z  INFO tokio-runtime-worker ThreadId(11) 🔻 BERAUSDC is dumping with -19.66% overall decline in the last 24 candles and -2.00% decline in the last 4 hours!
+2025-04-07T16:10:18.331295Z  INFO tokio-runtime-worker ThreadId(11) For token BERAUSDC: Average raw fluctuation: 0.2191, Average percent fluctuation: 4.95%
+2025-04-07T16:10:27.529259Z  INFO tokio-runtime-worker ThreadId(11) Sleeping for 60 seconds before the next iteration...

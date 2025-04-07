@@ -17,6 +17,8 @@ pub struct Config {
     pub bt_recent_options: Vec<u16>,
     pub bt_stop_loss_options: Vec<u16>,
     pub order_update_interval: u64,
+    pub quote_assets: Vec<String>,
+    pub transaction_amounts: Vec<f64>
 }
 
 impl Config {
@@ -69,6 +71,16 @@ impl Config {
             .split(',')
             .filter_map(|s| s.trim().parse::<u16>().ok())
             .collect::<Vec<u16>>();
+        let quote_assets = env::var("QUOTE_ASSETS")
+            .unwrap_or_else(|_| "USDC".to_string())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect::<Vec<String>>();
+        let transaction_amounts = env::var("TRANSACTION_AMOUNTS")
+            .unwrap_or_else(|_| "100".to_string())
+            .split(',')
+            .filter_map(|s| s.trim().parse::<f64>().ok())
+            .collect::<Vec<f64>>();
 
         Config {
             transaction_amount,
@@ -81,6 +93,8 @@ impl Config {
             bt_recent_options,
             bt_stop_loss_options,
             order_update_interval,
+            quote_assets,
+            transaction_amounts,
         }
     }
 }

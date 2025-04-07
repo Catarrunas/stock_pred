@@ -4,8 +4,14 @@ use tokio_tungstenite::connect_async;
 use tokio_stream::StreamExt;
 use serde_json::Value;
 use url::Url;
-
-
+use std::env;
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
+use hmac::{Hmac, Mac};
+use sha2::Sha256;
+type HmacSha256 = Hmac<Sha256>;
+use hex::encode as hex_encode;
+use dotenv::from_filename;
 
 #[derive(Debug, Deserialize)]
 pub struct ExchangeInfo {
@@ -24,22 +30,33 @@ pub struct SymbolInfo {
 #[derive(Debug, Deserialize)]
 pub struct Balance {
     pub asset: String,
-    pub free: f64,
-    pub locked: f64,
+    pub free: String,
+    pub locked: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct AccountInfo {
+    #[serde(default)]
     pub maker_commission: i64,
+    #[serde(default)]
     pub taker_commission: i64,
+    #[serde(default)]
     pub buyer_commission: i64,
+    #[serde(default)]
     pub seller_commission: i64,
+    #[serde(default)]
     pub can_trade: bool,
+    #[serde(default)]
     pub can_withdraw: bool,
+    #[serde(default)]
     pub can_deposit: bool,
+    #[serde(default)]
     pub update_time: u64,
+    #[serde(default)]
     pub account_type: String,
+    #[serde(default)]
     pub balances: Vec<Balance>,
+    #[serde(default)]
     pub permissions: Vec<String>,
 }
 
@@ -73,12 +90,12 @@ impl Binance {
     }
 
     /// Returns a list of all trading pairs where the quote asset is USDT and status is TRADING.
-    pub async fn get_usdt_pairs(&self) -> Result<Vec<SymbolInfo>, reqwest::Error> {
+    pub async fn get_pairs(&self,quote_asset: &str) -> Result<Vec<SymbolInfo>, reqwest::Error> {
         let exchange_info = self.get_exchange_info().await?;
-        let usdt_pairs: Vec<SymbolInfo> = exchange_info.symbols.into_iter()
-            .filter(|s| s.quote_asset == "USDT" && s.status == "TRADING")
+        let asset_pairs: Vec<SymbolInfo> = exchange_info.symbols.into_iter()
+            .filter(|s| s.quote_asset == quote_asset && s.status == "TRADING")
             .collect();
-        Ok(usdt_pairs)
+        Ok(asset_pairs)
     }
 
     /// Fetches aggregated 24hr ticker data for all symbols in one call.
@@ -121,53 +138,62 @@ impl Binance {
         }
     }
 
-    /// Checks the available balance for a given asset (placeholder).
-    /// For a real implementation, this requires signed requests.
-    pub async fn get_account_balance(&self, _asset: &str) -> Result<f64, reqwest::Error> {
-        // For demonstration purposes, return a dummy balance.
-        // Replace this with a signed API call to GET /api/v3/account.
-        Ok(1000.0)
-    }
+      /// Fetches account information from Binance using a signed request.
+    /// The API key and secret are loaded from environment variables.
+    pub async fn get_account_info(&self) -> Result<AccountInfo, reqwest::Error> {
+        // Load API credentials from environment variables.
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY")
+            .expect("BINANCE_API_KEY must be set in vars.env");
+        let secret_key = env::var("BINANCE_SECRET_KEY")
+            .expect("BINANCE_SECRET_KEY must be set in vars.env");
 
- /*/ /// Fetches account information using the signed /api/v3/account endpoint.
-    /// Note: This function requires proper API key and secret.
-    pub async fn get_account_info(&self, api_key: &str, secret_key: &str) -> Result<AccountInfo, reqwest::Error> {
-        let base_url = "https://api.binance.com";
-        let endpoint = "/api/v3/account";
-
-        // Create a timestamp in milliseconds.
+        let endpoint = "/account";
+        // Optional: set a recvWindow (default 5000 ms) to specify the allowed time difference.
+        let recv_window = 5000;
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
             .as_millis();
 
-        // Build the query string with the timestamp.
-        let mut params = Serializer::new(String::new())
-            .append_pair("timestamp", &timestamp.to_string())
-            .finish();
+        // Build the query string with both timestamp and recvWindow.
+        let query = format!("timestamp={}&recvWindow={}", timestamp, recv_window);
 
-        // Generate the signature using HMAC SHA256.
+        // Sign the query string using HMAC-SHA256 with the secret key.
         let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes())
             .expect("HMAC can take key of any size");
-        mac.update(params.as_bytes());
-        let signature = hex::encode(mac.finalize().into_bytes());
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
 
-        // Append the signature to the query string.
-        params.push_str("&signature=");
-        params.push_str(&signature);
+        // Build the full URL including the signature.
+        let url = format!("{}{}?{}&signature={}", self.base_url, endpoint, query, signature);
+        //print!("{}", url);
 
-        // Construct the full URL.
-        let url = format!("{}{}?{}", base_url, endpoint, params);
-
-        // Make the GET request with the API key in the header.
+        // Send the GET request with the API key in the header.
         let response = self.client
             .get(&url)
             .header("X-MBX-APIKEY", api_key)
             .send()
             .await?;
 
-        // Parse and return the JSON response.
-        let account_info = response.json::<AccountInfo>().await?;
+        // Read the response body as bytes.
+        let bytes = response.bytes().await?;
+        // Convert bytes to a string for debugging.
+        //let raw_body = String::from_utf8_lossy(&bytes);
+        //println!("Raw response body:\n{}", raw_body);
+        // Deserialize the JSON from the bytes.
+        let account_info: AccountInfo = serde_json::from_slice(&bytes)
+            .expect("Failed to deserialize account info");
         Ok(account_info)
-    }*/
+    }
+
+    pub async fn get_account_balance(&self, asset: &str) -> Result<f64, reqwest::Error> {
+        let account_info = self.get_account_info().await?;
+        if let Some(balance) = account_info.balances.into_iter().find(|b| b.asset == asset) {
+            if let Ok(free) = balance.free.parse::<f64>() {
+                return Ok(free);
+            }
+        }
+        Ok(0.0)
+    }
 }

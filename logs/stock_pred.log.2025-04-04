@@ -1,0 +1,47 @@
+2025-04-04T11:18:34.808758Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:18:34.814471Z  INFO tokio-runtime-worker ThreadId(10) [2025-04-04 11:18:34] Running stop loss update loop
+2025-04-04T11:18:34.814473Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:18:34] Starting market check iteration...
+2025-04-04T11:18:35.633197Z  INFO tokio-runtime-worker ThreadId(03) Filtered tokens: 93 tokens with positive 24r hours change
+2025-04-04T11:19:25.012956Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:19:25.018414Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:19:25] Starting market check iteration...
+2025-04-04T11:19:25.018427Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-04 11:19:25] Running stop loss update loop
+2025-04-04T11:19:25.847344Z  INFO tokio-runtime-worker ThreadId(02) USDC - Filtered tokens: 98 tokens with positive 24r hours change
+2025-04-04T11:26:10.090685Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:26:10.095120Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:26:10] Starting market check iteration...
+2025-04-04T11:26:10.095126Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-04 11:26:10] Running stop loss update loop
+2025-04-04T11:26:11.353837Z  INFO tokio-runtime-worker ThreadId(10) USDC - Filtered tokens: 680 tokens with positive 24r hours change
+2025-04-04T11:26:45.714585Z  INFO tokio-runtime-worker ThreadId(02) 🚀 LTOBTC is pumping with 40.54% overall growth in the last 24 hours and 26.83% growth in the last 4 hours!
+2025-04-04T11:26:45.714739Z  INFO tokio-runtime-worker ThreadId(02) For token LTOBTC: Average raw fluctuation: 0.0000, Average percent fluctuation: 6.55%
+2025-04-04T11:26:45.962932Z  INFO tokio-runtime-worker ThreadId(02) 🚀 LTOUSDT is pumping with 41.91% overall growth in the last 24 hours and 25.00% growth in the last 4 hours!
+2025-04-04T11:26:45.963068Z  INFO tokio-runtime-worker ThreadId(02) For token LTOUSDT: Average raw fluctuation: 0.0027, Average percent fluctuation: 7.81%
+2025-04-04T11:29:29.112792Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:29:29.118359Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-04 11:29:29] Running stop loss update loop
+2025-04-04T11:29:29.118373Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:29:29] Starting market check iteration...
+2025-04-04T11:29:29.497652Z  INFO tokio-runtime-worker ThreadId(11) USDC - Filtered tokens: 564 tokens with positive 24r hours change
+2025-04-04T11:29:57.028783Z  INFO tokio-runtime-worker ThreadId(12) 🚀 LTOBTC is pumping with 40.54% overall growth in the last 24 hours and 26.83% growth in the last 4 hours!
+2025-04-04T11:29:57.028880Z  INFO tokio-runtime-worker ThreadId(12) For token LTOBTC: Average raw fluctuation: 0.0000, Average percent fluctuation: 6.55%
+2025-04-04T11:29:57.276095Z  INFO tokio-runtime-worker ThreadId(12) 🚀 LTOUSDT is pumping with 38.28% overall growth in the last 24 hours and 21.80% growth in the last 4 hours!
+2025-04-04T11:29:57.276267Z  INFO tokio-runtime-worker ThreadId(12) For token LTOUSDT: Average raw fluctuation: 0.0027, Average percent fluctuation: 7.81%
+2025-04-04T11:31:38.413837Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:31:38.420948Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-04 11:31:38] Running stop loss update loop
+2025-04-04T11:31:38.420962Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:31:38] Starting market check iteration...
+2025-04-04T11:31:38.802811Z  INFO tokio-runtime-worker ThreadId(11) USDC - Filtered tokens: 457 tokens with positive 24r hours change
+2025-04-04T11:32:01.029877Z  INFO tokio-runtime-worker ThreadId(03) 🚀 LTOBTC is pumping with 40.54% overall growth in the last 24 hours and 26.83% growth in the last 4 hours!
+2025-04-04T11:32:01.029960Z  INFO tokio-runtime-worker ThreadId(03) For token LTOBTC: Average raw fluctuation: 0.0000, Average percent fluctuation: 6.55%
+2025-04-04T11:33:26.607984Z  INFO tokio-runtime-worker ThreadId(03) 🚀 USUALBTC is pumping with 28.36% overall growth in the last 24 hours and 2.99% growth in the last 4 hours!
+2025-04-04T11:33:26.608084Z  INFO tokio-runtime-worker ThreadId(03) For token USUALBTC: Average raw fluctuation: 0.0000, Average percent fluctuation: 3.87%
+2025-04-04T11:33:27.107046Z  INFO tokio-runtime-worker ThreadId(03) 🚀 USUALTRY is pumping with 27.62% overall growth in the last 24 hours and 0.94% growth in the last 4 hours!
+2025-04-04T11:33:27.107224Z  INFO tokio-runtime-worker ThreadId(03) For token USUALTRY: Average raw fluctuation: 0.2267, Average percent fluctuation: 4.70%
+2025-04-04T11:33:27.854766Z  INFO tokio-runtime-worker ThreadId(03) 🚀 USUALUSDC is pumping with 27.06% overall growth in the last 24 hours and 0.43% growth in the last 4 hours!
+2025-04-04T11:33:27.854819Z  INFO tokio-runtime-worker ThreadId(03) For token USUALUSDC: Average raw fluctuation: 0.0054, Average percent fluctuation: 4.23%
+2025-04-04T11:37:09.683544Z  INFO main ThreadId(01) Application started with logging!
+2025-04-04T11:37:09.688408Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-04 11:37:09] Running stop loss update loop
+2025-04-04T11:37:09.688417Z  INFO tokio-runtime-worker ThreadId(13) [2025-04-04 11:37:09] Starting market check iteration...
+2025-04-04T11:37:10.238881Z  INFO tokio-runtime-worker ThreadId(11) USDC - Filtered tokens: 52 tokens with positive 24r hours change
+2025-04-04T11:37:20.882858Z  INFO tokio-runtime-worker ThreadId(02) 🚀 USUALUSDC is pumping with 28.42% overall growth in the last 24 hours and 1.50% growth in the last 4 hours!
+2025-04-04T11:37:20.882950Z  INFO tokio-runtime-worker ThreadId(02) For token USUALUSDC: Average raw fluctuation: 0.0054, Average percent fluctuation: 4.23%
+2025-04-04T11:37:24.563100Z  INFO tokio-runtime-worker ThreadId(02) Sleeping for 60 seconds before the next iteration...
+2025-04-04T11:38:24.565524Z  INFO tokio-runtime-worker ThreadId(02) [2025-04-04 11:38:24] Starting market check iteration...
+2025-04-04T11:38:26.276507Z  INFO tokio-runtime-worker ThreadId(02) USDC - Filtered tokens: 58 tokens with positive 24r hours change
+2025-04-04T11:38:39.402864Z  INFO tokio-runtime-worker ThreadId(11) 🚀 USUALUSDC is pumping with 28.60% overall growth in the last 24 hours and 1.65% growth in the last 4 hours!
+2025-04-04T11:38:39.403030Z  INFO tokio-runtime-worker ThreadId(11) For token USUALUSDC: Average raw fluctuation: 0.0054, Average percent fluctuation: 4.23%
