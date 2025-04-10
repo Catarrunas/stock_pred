@@ -10,7 +10,6 @@ use stock_pred::config::SHARED_CONFIG;
    
 #[tokio::main]
 async fn main() {
-    sleep(Duration::from_secs(3600)).await;
     // Initialize logging (this sets up the reloadable layer).
     let _guard = init_tracing(false, Level::INFO);
     let binance = Binance::new();
@@ -46,24 +45,6 @@ async fn main() {
                     signal.avg_fluct_raw,
                     signal.avg_fluct_pct,
                 );
-                //Execute trade and trailing stop logic
-                if let Err(e) = binance
-                .execute_trade_with_trailing_stop(
-                    &signal.symbol,
-                    {
-                        // Find the transaction amount for the asset's quote
-                        let quote_asset = &signal.symbol[signal.symbol.len() - 4..]; // e.g. "USDT"
-                        let i = assets.iter().position(|a| a == quote_asset).unwrap_or(0);
-                        transaction_amounts.get(i).copied().unwrap_or(15.0)
-                    },
-                    5.0,     // trailing stop callback rate (5%)
-                    None,    // no activation price, trail immediately
-                )
-                .await{
-                    eprintln!("❌ Failed to execute trade: {}", e);
-                    info!("❌ Failed to execute trade: {}", e);
-                }
-            }
             // Extract values from the shared config
             // Extract values and drop the guard immediately:
             let loop_time = {
@@ -75,8 +56,8 @@ async fn main() {
             info!("Sleeping for {} seconds before the next iteration...", loop_time);
             // Now call sleep without holding the lock:
             sleep(Duration::from_secs(loop_time)).await;
-        }});    
+        }};    
+    });
     // Await both loops indefinitely.
     let _ = tokio::join!(market_check_handle);
-    
 }

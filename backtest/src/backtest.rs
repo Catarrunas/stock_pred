@@ -218,7 +218,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             println!("Trade details:");
             for trade in trades {
                 match trade.exit_index {
-                    Some(idx) => println!(
+                    Some(_idx) => println!(
                         "  Trade from candle {}: entry at {:.2}, exit at {:.2}, multiplier: {:.4}",
                         trade.entry_index + 1, trade.entry_price, trade.exit_price, trade.multiplier
                     ),

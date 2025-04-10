@@ -20,7 +20,7 @@ async fn main() {
     // Fetch aggregated 24hr ticker data.
     let all_tickers = match binance.get_all_ticker_24hr().await {
         Ok(tickers) => tickers,
-        Err(e) => {
+        Err(_e) => {
             return;
         }
     };

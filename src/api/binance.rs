@@ -12,6 +12,10 @@ use sha2::Sha256;
 type HmacSha256 = Hmac<Sha256>;
 use hex::encode as hex_encode;
 use dotenv::from_filename;
+use tracing::info;
+use crate::types::OpenOrder;
+use reqwest::Error;
+
 
 #[derive(Debug, Deserialize)]
 pub struct ExchangeInfo {
@@ -196,4 +200,173 @@ impl Binance {
         }
         Ok(0.0)
     }
+
+    pub async fn get_open_order_symbols(&self) -> Result<Vec<String>, reqwest::Error> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("BINANCE_API_KEY not set");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("BINANCE_SECRET_KEY not set");
+    
+        let endpoint = "/openOrders";
+        let recv_window = 5000;
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+    
+        let query = format!("timestamp={}&recvWindow={}", timestamp, recv_window);
+    
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+    
+        let url = format!("{}{}?{}&signature={}", self.base_url, endpoint, query, signature);
+    
+        let response = self.client
+            .get(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+    
+        let orders: Vec<OpenOrder> = response.json().await?;
+
+        for order in &orders {
+            info!("📘 Open Order: {} | Side: {} | Qty: {} | Price: {} | Type: {}",
+                order.symbol,
+                order.side,
+                order.orig_qty,
+                order.price,
+                order.type_field,
+            );
+            println!("📘 Open Order: {} | Side: {} | Qty: {} | Price: {} | Type: {}",
+                order.symbol,
+                order.side,
+                order.orig_qty,
+                order.price,
+                order.type_field,
+            );
+        }
+        
+        // Return only the symbols
+        let symbols: Vec<String> = orders.into_iter().map(|o| o.symbol).collect();
+        Ok(symbols)
+    }
+    
+    pub async fn place_market_buy_order(&self,symbol: &str,quantity: f64,) -> Result<(), reqwest::Error> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("BINANCE_API_KEY not set");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("BINANCE_SECRET_KEY not set");
+    
+        let endpoint = "/order";
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+    
+        let query = format!(
+            "symbol={}&side=BUY&type=MARKET&quantity={}&timestamp={}",
+            symbol, quantity, timestamp
+        );
+    
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+    
+        let url = format!(
+            "{}{}?{}&signature={}",
+            self.base_url, endpoint, query, signature
+        );
+    
+        let response = self.client
+            .post(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+    
+        let status = response.status();
+        let text = response.text().await?;
+    
+        if status.is_success() {
+            println!("✅ Buy order placed for {}: {}", symbol, text);
+            info!("✅ Buy order placed for {}: {}", symbol, text);
+        } else {
+            eprintln!("❌ Failed to place order: {} | {}", status, text);
+            info!("❌ Failed to place order: {} | {}", status, text);
+        }
+    
+        Ok(())
+    }
+
+    pub async fn place_trailing_stop_sell_order(&self,symbol: &str,quantity: f64,callback_rate: f64,activation_price: Option<f64>,) -> Result<(), Error> {
+            let _ = dotenv::from_filename("vars.env");
+            let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+            let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+
+            let timestamp = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis();
+
+            // Build base query
+            let mut query = format!(
+                "symbol={}&side=SELL&type=TRAILING_STOP_MARKET&quantity={}&callbackRate={}&recvWindow=5000&timestamp={}",
+                symbol,
+                quantity,
+                callback_rate,
+                timestamp
+            );
+
+            // Optional: add activation price
+            if let Some(price) = activation_price {
+                query.push_str(&format!("&activationPrice={}", price));
+            }
+
+            // Sign it
+            let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+            mac.update(query.as_bytes());
+            let signature = hex_encode(mac.finalize().into_bytes());
+
+            // Final URL
+            let url = format!(
+                "{}{}?{}&signature={}",
+                self.base_url,
+                "/order",
+                query,
+                signature
+            );
+
+            // Send the order
+            let response = self.client
+                .post(&url)
+                .header("X-MBX-APIKEY", api_key)
+                .send()
+                .await?;
+
+            let status = response.status();
+            let body = response.text().await?;
+
+            if status.is_success() {
+                println!("✅ Trailing stop order placed successfully: {}", body);
+                info!("✅ Trailing stop order placed successfully: {}", body);
+            } else {
+                eprintln!("❌ Failed to place trailing stop order: {}", body);
+                info!("❌ Failed to place trailing stop order: {}", body);
+            }
+
+            Ok(())
+        }
+    
+    pub async fn execute_trade_with_trailing_stop(&self,symbol: &str,quantity: f64,callback_rate: f64,activation_price: Option<f64>,) -> Result<(), reqwest::Error> {
+        println!("🟢 Placing market BUY for {}", symbol);
+        info!("🟢 Placing market BUY for {}", symbol);
+        self.place_market_buy_order(symbol, quantity).await?;
+    
+        println!("🟡 Placing trailing STOP SELL for {} ({}%)", symbol, callback_rate);
+        info!("🟡 Placing trailing STOP SELL for {} ({}%)", symbol, callback_rate);
+        self.place_trailing_stop_sell_order(symbol, quantity, callback_rate, activation_price)
+            .await?;
+        println!("✅ Trade + trailing stop setup complete.");
+        Ok(())
+    }
 }
+
+    

@@ -8,15 +8,19 @@ name = "pred"
 path = "pred/src/pred.rs"
 
 [[bin]]
-name = "pred_test"
+name = "pred_generic"
 path = "pred/src/pred_gen.rs"
+
+[[bin]]
+name = "pred_test"
+path = "pred/src/pred_testing.rs"
 
 [[bin]]
 name = "neg_pred"
 path = "neg_pred/src/neg_pred.rs"
 
 [[bin]]
-name = "neg_pred_test"
+name = "neg_pred_generic"
 path = "neg_pred/src/neg_pred_gen.rs"
 
 [[bin]]
@@ -50,3 +54,5 @@ notify = "5.1"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tracing-appender = "0.2.2"
+log = "0.4"
+env_logger = "0.10" 
