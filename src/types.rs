@@ -28,6 +28,8 @@ pub struct OpenOrder {
     pub is_working: bool,
     #[serde(rename = "origQuoteOrderQty")]
     pub orig_quote_order_qty: String,
+    #[serde(rename = "orderId")]
+    pub order_id: u64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
