@@ -7,15 +7,32 @@ use url::Url;
 use std::env;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
+use chrono::Utc;
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 type HmacSha256 = Hmac<Sha256>;
+use std::collections::HashSet;
 use hex::encode as hex_encode;
 use dotenv::from_filename;
-use tracing::info;
+use tracing::{info,error};
 use crate::types::OpenOrder;
+use crate::types::Order;
 use reqwest::Error;
+use crate::config::SHARED_CONFIG;
+use std::collections::HashMap;
+use tokio::time::Duration;
+use tokio::time::sleep;
+use reqwest::Error as ReqwestError;         
+use std::error::Error as StdError;      
 
+#[derive(Debug, Clone, Default)]
+pub struct SymbolFilters {
+    pub tick_size: f64,
+    pub step_size: f64,
+    pub min_qty: f64,
+    pub min_price: f64,
+    pub min_notional: f64,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct ExchangeInfo {
@@ -25,11 +42,16 @@ pub struct ExchangeInfo {
 #[derive(Debug, Deserialize)]
 pub struct SymbolInfo {
     pub symbol: String,
+    #[serde(rename = "status")]
     pub status: String,
+    #[serde(rename = "baseAsset")]
+    #[allow(dead_code)]
     pub base_asset: String,
+    #[serde(rename = "quoteAsset")]
     pub quote_asset: String,
+    #[serde(rename = "orderTypes")]
+    pub order_types: Vec<String>,
 }
-
 
 #[derive(Debug, Deserialize)]
 pub struct Balance {
@@ -72,9 +94,28 @@ pub struct Ticker24hr {
     // Add additional fields if needed.
 }
 
+#[derive(Debug, Deserialize)]
+struct TickerPrice {
+    price: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, Deserialize)]
+struct OrderResponse {
+    executedQty: String,
+}
+
 pub struct Binance {
     client: Client,
     base_url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct TrackedPosition {
+    pub symbol: String,
+    pub entry_price: f64,
+    pub current_stop_price: f64,
+    pub quantity: f64,
 }
 
 impl Binance {
@@ -86,7 +127,7 @@ impl Binance {
     }
 
      /// Fetches the exchange information from Binance.
-     pub async fn get_exchange_info(&self) -> Result<ExchangeInfo, reqwest::Error> {
+    pub async fn get_exchange_info(&self) -> Result<ExchangeInfo, reqwest::Error> {
         let url = format!("{}/exchangeInfo", self.base_url);
         let response = self.client.get(&url).send().await?;
         let info = response.json::<ExchangeInfo>().await?;
@@ -220,6 +261,7 @@ impl Binance {
         let signature = hex_encode(mac.finalize().into_bytes());
     
         let url = format!("{}{}?{}&signature={}", self.base_url, endpoint, query, signature);
+
     
         let response = self.client
             .get(&url)
@@ -251,21 +293,699 @@ impl Binance {
         Ok(symbols)
     }
     
-    pub async fn place_market_buy_order(&self,symbol: &str,quantity: f64,) -> Result<(), reqwest::Error> {
+    pub async fn place_market_buy_order(&self,symbol: &str,quantity: f64,) -> Result<u64, Box<dyn StdError>> {
         let _ = from_filename("vars.env");
-        let api_key = env::var("BINANCE_API_KEY").expect("BINANCE_API_KEY not set");
-        let secret_key = env::var("BINANCE_SECRET_KEY").expect("BINANCE_SECRET_KEY not set");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        let query = format!(
+            "symbol={}&side=BUY&type=MARKET&quantity={:.5}&recvWindow=5000&timestamp={}",
+            symbol,
+            quantity,
+            timestamp
+        );
+
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+
+        let url = format!(
+            "{}{}?{}&signature={}",
+            self.base_url,
+            "/order",
+            query,
+            signature
+        );
+
+        let response = self
+            .client
+            .post(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+
+        let status = response.status();
+        let body = response.text().await?;
+
+        if status.is_success() {
+            let parsed: serde_json::Value = serde_json::from_str(&body).unwrap_or_default();
+            let order_id = parsed["orderId"].as_u64().unwrap_or(0);
+            println!("✅ Market buy order placed successfully. Order ID: {}", order_id);
+            info!("✅ Market buy order placed: {:?}", parsed);
+            Ok(order_id)
+        } else {
+            eprintln!("❌ Failed to place market buy order: {}", body);
+            info!("❌ Failed to place market buy order: {}", body);
+            return Err(Box::<dyn StdError + Send + Sync>::from("Buy order failed"));
+        }
+    }
+
+    pub async fn place_trailing_stop_sell_order(&self, symbol: &str, quantity: f64, callback_rate: f64,  activation_price: Option<f64>,) -> Result<u64, Box<dyn std::error::Error>> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        let mut query_parts = vec![
+            format!("symbol={}", symbol),
+            "side=SELL".to_string(),
+            "type=TRAILING_STOP_MARKET".to_string(),
+            format!("quantity={:.5}", quantity),
+            format!("callbackRate={:.1}", callback_rate),
+            "recvWindow=5000".to_string(),
+            format!("timestamp={}", timestamp),
+        ];
+
+        if let Some(price) = activation_price {
+            query_parts.push(format!("activationPrice={}", price));
+        }
+
+        let query = query_parts.join("&");
+
+        
+
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+
+        let url = format!(
+            "{}{}?{}&signature={}",
+            self.base_url,
+            "/order",
+            query,
+            signature
+        );
+
+        let response = self
+            .client
+            .post(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+
+        let status = response.status();
+        let body = response.text().await?;
+
+        if status.is_success() {
+            let parsed: serde_json::Value = serde_json::from_str(&body).unwrap_or_default();
+            let order_id = parsed["orderId"].as_u64().unwrap_or(0);
+            println!("✅ Trailing stop order placed successfully. Order ID: {}", order_id);
+            info!("✅ Trailing stop order placed successfully: {:?}", parsed);
+            Ok(order_id)
+        } else {
+            eprintln!("❌ Failed to place trailing stop order: {}", body);
+            info!("❌ Failed to place trailing stop order: {}", body);
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Trailing stop order failed",
+            )));
+        }
+    }
     
-        let endpoint = "/order";
+    pub async fn get_executed_quantity(&self, symbol: &str, order_id: u64) -> Result<f64, Error> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        let query = format!("symbol={}&orderId={}&timestamp={}&recvWindow=5000", symbol, order_id, timestamp);
+
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+
+        let url = format!("{}{}?{}&signature={}", self.base_url, "/order", query, signature);
+
+        let response = self
+            .client
+            .get(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+
+        let order: OrderResponse = response.json().await?;
+        let qty = order.executedQty.parse::<f64>().unwrap_or(0.0);
+        Ok((qty * 100000.0).floor() / 100000.0)
+    }
+
+    pub async fn execute_trade_with_fallback_stop(&self,symbol: &str, activation_price: Option<f64>,) -> Result<(), Box<dyn StdError>> {
+        let quote_asset = &symbol[symbol.len() - 4..];
+        let (quote_amount, stop_loss_percent) = {
+            let config = SHARED_CONFIG.read().unwrap();
+            let i = config.quote_assets.iter().position(|a| a == quote_asset).unwrap_or(0);
+            let quote_amount = config.transaction_amounts.get(i).copied().unwrap_or(5.0);
+            let stop_loss_percent = config.stop_loss_percent;
+            (quote_amount, stop_loss_percent)
+        };
+    
+        // Get filters
+        let filters = Binance::get_symbol_filters(self, symbol).await?;
+    
+        let raw_qty = self.calculate_quantity_for_quote(symbol, quote_amount).await?;
+        let quantity = Binance::round_to_step(raw_qty, filters.step_size);
+    
+        if quantity < filters.min_qty {
+            println!("❌ {}: Adjusted quantity {:.5} below minQty {:.5}. Skipping.", symbol, quantity, filters.min_qty);
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("Quantity too low: {} < {}", quantity, filters.min_qty),
+            )));
+        }
+    
+        println!("📈 Executing market buy for {} with {:.6} units ({} quote)", symbol, quantity, quote_amount);
+        info!("📈 Executing market buy for {} with {:.6} units ({} quote)", symbol, quantity, quote_amount);
+    
+        // Wait briefly to ensure balance is updated on Binance's end
+       // 1. Place market buy
+        let buy_order_id = self.place_market_buy_order(symbol, quantity).await?;
+
+        // 2. Wait briefly for wallet to update
+        tokio::time::sleep(Duration::from_secs(10)).await;
+    
+        let base_asset = &symbol[..symbol.len() - 4];
+        let confirmed_balance = self.get_account_balance(base_asset).await?;
+        let adjusted_balance = Binance::round_to_step(confirmed_balance, filters.step_size);
+    
+        let current_price = self.get_price(symbol).await?;
+    
+        let supports_trailing = self
+            .symbol_supports_order_type(symbol, "TRAILING_STOP_MARKET")
+            .await
+            .unwrap_or(false);
+    
+        if supports_trailing {
+            println!("📉 Using TRAILING_STOP_MARKET for {}", symbol);
+            info!("📉 Using TRAILING_STOP_MARKET for {}", symbol);
+            self.place_trailing_stop_sell_order(symbol, adjusted_balance, stop_loss_percent, activation_price).await?;
+        } else {
+            println!("📉 Using STOP_LOSS_LIMIT for {}", symbol);
+            info!("📉 Using STOP_LOSS_LIMIT for {}", symbol);
+            let stop_price = current_price * (1.0 - stop_loss_percent / 100.0);
+            let stop_price = Binance::round_to_step(stop_price, filters.tick_size);
+            let limit_price = stop_price;
+    
+            self.place_stop_loss_limit_order(symbol, adjusted_balance, stop_price, limit_price).await?;
+        }
+    
+        println!("✅ Trade + stop setup complete for {}", symbol);
+        info!("✅ Trade + stop setup complete for {}", symbol);
+        Ok(())
+    }
+    
+    pub async fn count_today_losses(&self) -> Result<u32, Error> {
+        let _ = dotenv::from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+
+        let now = Utc::now();
+        let start_of_day = now.date_naive().and_hms_opt(0, 0, 0).unwrap();
+        let start_time = start_of_day.and_utc().timestamp_millis();
+        let end_time = now.timestamp_millis();
+
+        let query = format!(
+            "startTime={}&endTime={}&timestamp={}&recvWindow=5000",
+            start_time,
+            end_time,
+            end_time
+        );
+
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+
+        let url = format!(
+            "{}{}?{}&signature={}",
+            self.base_url,
+            "/allOrders",
+            query,
+            signature
+        );
+
+        let response = self.client
+            .get(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+
+            let text = response.text().await?;
+            let orders: Vec<Order> = match serde_json::from_str(&text) {
+                Ok(data) => data,
+                Err(_) => {
+                    info!("❌ Unexpected response: {}", text);
+                    eprintln!("❌ Unexpected response: {}", text);
+                    return Ok(0); // Gracefully assume no losses if response is malformed
+                }
+            };
+        let mut losses = 0u32;
+        let mut last_buy_price: Option<f64> = None;
+
+        for order in orders.into_iter().filter(|o| o.status == "FILLED") {
+            let qty = order.executed_qty.parse::<f64>().unwrap_or(0.0);
+            let quote = order.cummulative_quote_qty.parse::<f64>().unwrap_or(0.0);
+
+            if qty == 0.0 {
+                continue;
+            }
+
+            let avg_price = quote / qty;
+
+            match order.side.as_str() {
+                "BUY" => {
+                    last_buy_price = Some(avg_price);
+                }
+                "SELL" => {
+                    if let Some(entry_price) = last_buy_price {
+                        if avg_price < entry_price {
+                            losses += 1;
+                            println!("🔻 Loss detected: bought at {:.2}, sold at {:.2}", entry_price, avg_price);
+                            info!("🔻 Loss detected: bought at {:.2}, sold at {:.2}", entry_price, avg_price);
+                        } else {
+                            info!("✅ Profit: bought at {:.2}, sold at {:.2}", entry_price, avg_price);
+                            println!("✅ Profit: bought at {:.2}, sold at {:.2}", entry_price, avg_price);
+                        }
+                        last_buy_price = None; // clear after one SELL
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        Ok(losses)
+    }
+
+    pub async fn should_pause_for_losses(&self) -> Result<bool, Error> {
+        let max_losses = {
+            let cfg = SHARED_CONFIG.read().unwrap();
+            cfg.max_loss_day
+        };
+
+        match self.count_today_losses().await {
+            Ok(losses) => {
+                println!("Today's confirmed losses: {} (max allowed: {})", losses, max_losses);
+                info!(" Today's confirmed losses: {} (max allowed: {})", losses, max_losses);
+                Ok(losses >= max_losses)
+            }
+            Err(e) => {
+                eprintln!("Could not check daily losses: {}", e);
+                Ok(false) // fail open
+            }
+        }
+    }
+
+    pub async fn calculate_quantity_for_quote(&self,symbol: &str,quote_amount: f64,) -> Result<f64, Box<dyn std::error::Error>> {
+        let url = format!("{}/ticker/price?symbol={}", self.base_url, symbol);
+        let response = self.client.get(&url).send().await?;
+        let ticker: TickerPrice = response.json().await?;
+
+        let price = ticker.price.parse::<f64>().unwrap_or(0.0);
+        if price == 0.0 {
+            eprintln!("❌ {} returned zero price — skipping.", symbol);
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!("Price for {} could not be parsed or was zero", symbol),
+        )));
+    }
+
+        let quantity = quote_amount / price;
+        let rounded = (quantity * 100000.0).floor() / 100000.0; // round down to 5 decimal places
+
+        info!("Calculated quantity for {} at {:.6} price: {:.6} units for {:.2} {}", symbol, price, rounded, quote_amount, &symbol[symbol.len()-4..]);
+        println!("Calculated quantity for {} at {:.6} price: {:.6} units for {:.2} {}", symbol, price, rounded, quote_amount, &symbol[symbol.len()-4..]);
+
+        Ok(rounded)
+    }
+
+    pub async fn supports_trailing_stop(&self, symbol: &str) -> Result<bool, Error> {
+        let url = format!("{}/exchangeInfo?symbol={}", self.base_url, symbol);
+        let response = self.client.get(&url).send().await?;
+        let data: serde_json::Value = response.json().await?;
+    
+        let order_types = &data["symbols"][0]["orderTypes"];
+        Ok(order_types.as_array()
+            .map(|types| types.iter().any(|t| t == "TRAILING_STOP_MARKET"))
+            .unwrap_or(false))
+    }
+
+    pub async fn get_spot_balances(&self) -> Result<Vec<(String, f64)>, Error> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+    
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis();
     
+        let query = format!("timestamp={}&recvWindow=5000", timestamp);
+    
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+    
+        let url = format!("{}{}?{}&signature={}", self.base_url, "/account", query, signature);
+    
+        let response = self
+            .client
+            .get(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+    
+        let account: AccountInfo = response.json().await?;
+    
+        let excluded_assets = {
+            let cfg = crate::config::SHARED_CONFIG.read().unwrap();
+            cfg.excluded_assets_spot.clone()
+        };
+        //println!("Excluded assets: {:?}", excluded_assets);
+        let threshold = 0.0001; 
+        let holdings = account
+            .balances
+            .into_iter()
+            .filter_map(|b| {
+                let free = b.free.parse::<f64>().unwrap_or(0.0);
+                if free > threshold && !excluded_assets.contains(&b.asset) {
+                    Some((b.asset, free))
+                } else {
+                    None
+                }
+            })
+            .collect();
+    
+        Ok(holdings)
+    }
+    
+    pub async fn symbol_supports_order_type(&self, symbol: &str, order_type: &str,) -> Result<bool, Error> {
+        let url = format!("{}/exchangeInfo?symbol={}", self.base_url, symbol);
+        let response = self.client.get(&url).send().await?;
+        let info: ExchangeInfo = response.json().await?;
+
+        if let Some(symbol_info) = info.symbols.into_iter().find(|s| s.symbol == symbol) {
+            Ok(symbol_info.order_types.contains(&order_type.to_string()))
+        } else {
+            Ok(false)
+        }
+    }
+
+    /// Calculates a stop price given a current price and loss percentage
+    fn calculate_stop_price(current_price: f64, stop_percent: f64) -> f64 {
+    let stop_price = current_price * (1.0 - stop_percent / 100.0);
+    (stop_price * 10000.0).floor() / 10000.0 // round to 4 decimals
+}
+
+/// Simulated trailing stop for symbols that do not support TRAILING_STOP_MARKET
+    pub async fn update_stop_loss_loop(binance: &Binance,mut tracked: HashMap<String, TrackedPosition>, stop_loss_percent: f64,) {
+    loop {
+        for (symbol, mut position) in tracked.clone() {
+            match binance.get_price(&symbol).await {
+                Ok(current_price) => {
+                    let new_stop = Self::calculate_stop_price(current_price, stop_loss_percent);
+
+                    if new_stop > position.current_stop_price {
+                        info!("🔁 Adjusting stop for {}: old {:.4} → new {:.4}", symbol, position.current_stop_price, new_stop);
+                        // Here: cancel old STOP_LOSS_LIMIT and place a new one
+                        // Placeholder: binance.cancel_order(symbol, order_id).await;
+                        // Placeholder: binance.place_stop_loss_limit_order(symbol, quantity, new_stop).await;
+                        position.current_stop_price = new_stop;
+                        tracked.insert(symbol.clone(), position);
+                    } else {
+                        info!("✅ No adjustment needed for {}", symbol);
+                    }
+                }
+                Err(e) => {
+                    error!("Failed to fetch price for {}: {}", symbol, e);
+                }
+            }
+        }
+
+        // Wait for 15 minutes
+        sleep(Duration::from_secs(15 * 60)).await;
+    }
+}
+
+    pub async fn get_price(&self, symbol: &str) -> Result<f64, ReqwestError> {
+        let url = format!("{}/ticker/price?symbol={}", self.base_url, symbol);
+        let response = self.client.get(&url).send().await?;
+        let ticker: TickerPrice = response.json().await?;
+        let price = ticker.price.parse::<f64>().unwrap_or(0.0);
+        Ok(price)
+    }
+
+    pub async fn place_stop_loss_limit_order(&self,symbol: &str,quantity: f64,stop_price: f64,limit_price: f64,) -> Result<u64, Box<dyn StdError>> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY")?;
+        let secret_key = env::var("BINANCE_SECRET_KEY")?;
+    
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)?
+            .as_millis();
+    
         let query = format!(
-            "symbol={}&side=BUY&type=MARKET&quantity={}&timestamp={}",
-            symbol, quantity, timestamp
+            "symbol={}&side=SELL&type=STOP_LOSS_LIMIT&quantity={:.5}&stopPrice={:.4}&price={:.4}&timeInForce=GTC&recvWindow=5000&timestamp={}",
+            symbol, quantity, stop_price, limit_price, timestamp
         );
+    
+        let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes())?;
+        mac.update(query.as_bytes());
+        let signature = hex_encode(mac.finalize().into_bytes());
+    
+        let url = format!(
+            "{}{}?{}&signature={}",
+            self.base_url,
+            "/order",
+            query,
+            signature
+        );
+    
+        let response = self
+            .client
+            .post(&url)
+            .header("X-MBX-APIKEY", api_key)
+            .send()
+            .await?;
+    
+        let status = response.status();
+        let body = response.text().await?;
+    
+        if status.is_success() {
+            let parsed: serde_json::Value = serde_json::from_str(&body)?;
+            let order_id = parsed["orderId"].as_u64().unwrap_or(0);
+            println!("✅ STOP_LOSS_LIMIT order placed for {}. Order ID: {}", symbol, order_id);
+            info!("✅ STOP_LOSS_LIMIT order placed: {:?}", parsed);
+            Ok(order_id)
+        } else {
+            eprintln!("❌ Failed to place STOP_LOSS_LIMIT order: {}", body);
+            Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to place stop loss limit order",
+            )))
+        }
+    }
+
+    /// Periodically check held spot tokens and ensure a stop-loss is in place or updated.
+    pub async fn manage_stop_loss_limit_loop(&self) {
+        loop {
+            println!("🔁 Starting stop-loss management loop");
+            let balances = match self.get_spot_balances().await {
+                Ok(b) => b,
+                Err(e) => {
+                    error!("Failed to fetch balances: {}", e);
+                    println!("❌ Failed to fetch balances: {}", e);
+                    sleep(Duration::from_secs(60)).await;
+                    continue;
+                }
+            };
+    
+            let quote_assets = {
+                let cfg = SHARED_CONFIG.read().unwrap();
+                cfg.quote_assets.clone()
+            };
+    
+            let open_orders = match self.get_open_orders().await {
+                Ok(orders) => orders,
+                Err(e) => {
+                    error!("Failed to fetch full open orders: {}", e);
+                    println!("❌ Failed to fetch full open orders: {}", e);
+                    vec![]
+                }
+            };
+    
+            let trailing_stop_symbols: HashSet<String> = open_orders
+                .iter()
+                .filter(|o| o.type_field == "TRAILING_STOP_MARKET")
+                .map(|o| o.symbol.clone())
+                .collect();
+    
+            for (asset, amount) in balances {
+                if amount == 0.0 || quote_assets.contains(&asset) {
+                    continue;
+                }
+    
+                let mut valid_symbol = None;
+                for quote in &quote_assets {
+                    let symbol = format!("{}{}", asset, quote);
+    
+                    if let Ok(true) = self.symbol_supports_order_type(&symbol, "STOP_LOSS_LIMIT").await {
+                        valid_symbol = Some(symbol);
+                        break;
+                    }
+                }
+    
+                if let Some(symbol) = valid_symbol {
+                    if trailing_stop_symbols.contains(&symbol) {
+                        info!("✅ Trailing stop already active for {}", symbol);
+                        println!("✅ Trailing stop already active for {}", symbol);
+                        continue;
+                    }
+    
+                    let stop_loss_percent = SHARED_CONFIG.read().unwrap().stop_loss_percent;
+    
+                    match self.get_price(&symbol).await {
+                        Ok(price) => {
+                            let filters = match Binance::get_symbol_filters(self, &symbol).await {
+                                Ok(f) => f,
+                                Err(e) => {
+                                    error!("❌ Failed to fetch filters for {}: {}", symbol, e);
+                                    println!("❌ Failed to fetch filters for {}: {}", symbol, e);
+                                    continue;
+                                }
+                            };
+    
+                            if amount < filters.min_qty {
+                                println!("❌ Skipping {} — wallet balance {:.4} is below minQty {:.4}", symbol, amount, filters.min_qty);
+                                continue;
+                            }
+    
+                            let raw_stop = price * (1.0 - stop_loss_percent / 100.0);
+                            let stop_price = Binance::round_to_step(raw_stop, filters.tick_size);
+                            let limit_price = stop_price;
+                            let quantity = Binance::round_to_step(amount, filters.step_size);
+                            let notional = stop_price * quantity;
+    
+                            if stop_price <= 0.0 || quantity < filters.min_qty || stop_price < filters.min_price {
+                                error!("❌ Skipping {} — invalid stop {:.4} or qty {:.4}", symbol, stop_price, quantity);
+                                println!("❌ Skipping {} — invalid stop {:.4} or qty {:.4}", symbol, stop_price, quantity);
+                                continue;
+                            }
+    
+                            if notional < filters.min_notional {
+                                error!("❌ Skipping {} — notional value {:.4} below minNotional {:.4}", symbol, notional, filters.min_notional);
+                                println!("❌ Skipping {} — notional value {:.4} below minNotional {:.4}", symbol, notional, filters.min_notional);
+                                continue;
+                            }
+    
+                            let existing_order = open_orders
+                                .iter()
+                                .find(|o| o.symbol == symbol && o.type_field == "STOP_LOSS_LIMIT");
+    
+                            if let Some(order) = existing_order {
+                                let existing_stop_price = order.stop_price.parse::<f64>().unwrap_or(0.0);
+                                if stop_price <= existing_stop_price {
+                                    info!("🔁 Existing stop for {} is still valid ({} ≥ {}).", symbol, existing_stop_price, stop_price);
+                                    println!("🔁 Existing stop for {} is still valid ({} ≥ {}).", symbol, existing_stop_price, stop_price);
+                                    continue;
+                                } else {
+                                    info!("🔄 Replacing outdated stop for {}: {:.4} → {:.4}", symbol, existing_stop_price, stop_price);
+                                    println!("🔄 Replacing outdated stop for {}: {:.4} → {:.4}", symbol, existing_stop_price, stop_price);
+                                }
+                            } else {
+                                info!("🔐 Placing new stop-loss for {} at {:.4}", symbol, stop_price);
+                                println!("🔐 Placing new stop-loss for {} at {:.4}", symbol, stop_price);
+                            }
+    
+                            if let Err(e) = self.place_stop_loss_limit_order(&symbol, quantity, stop_price, limit_price).await {
+                                error!("❌ Failed to place stop-loss for {}: {}", symbol, e);
+                                println!("❌ Failed to place stop-loss for {}: {}", symbol, e);
+                            }
+                        }
+                        Err(e) => {
+                            error!("Failed to fetch price for {}: {}", symbol, e);
+                            println!("❌ Failed to fetch price for {}: {}", symbol, e);
+                        }
+                    }
+                }
+            }
+    
+            let interval = {
+                let cfg = SHARED_CONFIG.read().unwrap();
+                cfg.stop_loss_loop_seconds
+            };
+    
+            info!("⏱ Sleeping {} seconds before next stop-loss check", interval);
+            println!("⏱ Sleeping {} seconds before next stop-loss check", interval);
+            sleep(Duration::from_secs(interval)).await;
+        }
+    }
+
+    pub async fn get_symbol_filters(binance: &Binance, symbol: &str) -> Result<SymbolFilters, Error> {
+        let url = format!("{}/exchangeInfo?symbol={}", binance.base_url, symbol);
+        let response = binance.client.get(&url).send().await?;
+        let json: serde_json::Value = response.json().await?;
+    
+        let filters = &json["symbols"][0]["filters"];
+    
+        let mut tick_size = 0.0;
+        let mut step_size = 0.0;
+        let mut min_qty = 0.0;
+        let mut min_price = 0.0;
+        let mut min_notional = 0.0;
+    
+        for f in filters.as_array().unwrap_or(&vec![]) {
+            if let Some(filter_type) = f.get("filterType").and_then(|v| v.as_str()) {
+                match filter_type {
+                    "PRICE_FILTER" => {
+                        tick_size = f["tickSize"].as_str().unwrap_or("0.0").parse().unwrap_or(0.0);
+                        min_price = f["minPrice"].as_str().unwrap_or("0.0").parse().unwrap_or(0.0);
+                    },
+                    "LOT_SIZE" => {
+                        step_size = f["stepSize"].as_str().unwrap_or("0.0").parse().unwrap_or(0.0);
+                        min_qty = f["minQty"].as_str().unwrap_or("0.0").parse().unwrap_or(0.0);
+                    },
+                    "MIN_NOTIONAL" => {
+                        min_notional = f["minNotional"].as_str().unwrap_or("0.0").parse().unwrap_or(0.0);
+                    },
+                    _ => {}
+                }
+            }
+        }
+    
+        Ok(SymbolFilters {
+            tick_size,
+            step_size,
+            min_qty,
+            min_price,
+            min_notional,
+        })
+    }
+    
+    pub fn round_to_step(value: f64, step: f64) -> f64 {
+        (value / step).floor() * step
+    }
+
+    pub async fn get_open_orders(&self) -> Result<Vec<OpenOrder>, Error> {
+        let _ = from_filename("vars.env");
+        let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
+        let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
+    
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+    
+        let query = format!("timestamp={}&recvWindow=5000", timestamp);
     
         let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
         mac.update(query.as_bytes());
@@ -273,100 +993,26 @@ impl Binance {
     
         let url = format!(
             "{}{}?{}&signature={}",
-            self.base_url, endpoint, query, signature
+            self.base_url,
+            "/openOrders",
+            query,
+            signature
         );
     
         let response = self.client
-            .post(&url)
+            .get(&url)
             .header("X-MBX-APIKEY", api_key)
             .send()
             .await?;
     
-        let status = response.status();
-        let text = response.text().await?;
-    
-        if status.is_success() {
-            println!("✅ Buy order placed for {}: {}", symbol, text);
-            info!("✅ Buy order placed for {}: {}", symbol, text);
-        } else {
-            eprintln!("❌ Failed to place order: {} | {}", status, text);
-            info!("❌ Failed to place order: {} | {}", status, text);
-        }
-    
-        Ok(())
+        let orders: Vec<OpenOrder> = response.json().await?;
+        Ok(orders)
     }
-
-    pub async fn place_trailing_stop_sell_order(&self,symbol: &str,quantity: f64,callback_rate: f64,activation_price: Option<f64>,) -> Result<(), Error> {
-            let _ = dotenv::from_filename("vars.env");
-            let api_key = env::var("BINANCE_API_KEY").expect("Missing BINANCE_API_KEY");
-            let secret_key = env::var("BINANCE_SECRET_KEY").expect("Missing BINANCE_SECRET_KEY");
-
-            let timestamp = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_millis();
-
-            // Build base query
-            let mut query = format!(
-                "symbol={}&side=SELL&type=TRAILING_STOP_MARKET&quantity={}&callbackRate={}&recvWindow=5000&timestamp={}",
-                symbol,
-                quantity,
-                callback_rate,
-                timestamp
-            );
-
-            // Optional: add activation price
-            if let Some(price) = activation_price {
-                query.push_str(&format!("&activationPrice={}", price));
-            }
-
-            // Sign it
-            let mut mac = HmacSha256::new_from_slice(secret_key.as_bytes()).unwrap();
-            mac.update(query.as_bytes());
-            let signature = hex_encode(mac.finalize().into_bytes());
-
-            // Final URL
-            let url = format!(
-                "{}{}?{}&signature={}",
-                self.base_url,
-                "/order",
-                query,
-                signature
-            );
-
-            // Send the order
-            let response = self.client
-                .post(&url)
-                .header("X-MBX-APIKEY", api_key)
-                .send()
-                .await?;
-
-            let status = response.status();
-            let body = response.text().await?;
-
-            if status.is_success() {
-                println!("✅ Trailing stop order placed successfully: {}", body);
-                info!("✅ Trailing stop order placed successfully: {}", body);
-            } else {
-                eprintln!("❌ Failed to place trailing stop order: {}", body);
-                info!("❌ Failed to place trailing stop order: {}", body);
-            }
-
-            Ok(())
-        }
     
-    pub async fn execute_trade_with_trailing_stop(&self,symbol: &str,quantity: f64,callback_rate: f64,activation_price: Option<f64>,) -> Result<(), reqwest::Error> {
-        println!("🟢 Placing market BUY for {}", symbol);
-        info!("🟢 Placing market BUY for {}", symbol);
-        self.place_market_buy_order(symbol, quantity).await?;
-    
-        println!("🟡 Placing trailing STOP SELL for {} ({}%)", symbol, callback_rate);
-        info!("🟡 Placing trailing STOP SELL for {} ({}%)", symbol, callback_rate);
-        self.place_trailing_stop_sell_order(symbol, quantity, callback_rate, activation_price)
-            .await?;
-        println!("✅ Trade + trailing stop setup complete.");
-        Ok(())
-    }
 }
+
+
+
+
 
     

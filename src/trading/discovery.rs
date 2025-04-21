@@ -8,17 +8,33 @@ use log::{info, error};
 use crate::api::binance::Binance;
 use std::collections::HashSet;
 
-pub async fn discover_signals(
-    binance: &Binance,
-    assets: &[String],
-    transaction_amounts: &[f64],
-    trend: TrendDirection,
-) -> Vec<Signal> {
+pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_amounts: &[f64], trend: TrendDirection,) -> Vec<Signal> {
     let mut signals = Vec::new();
 
     let timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
     info!("[{}] Starting market scan...", timestamp);
-    println!("[{}] Starting market scan...", timestamp);
+
+    // ✅ Get open order symbols
+    let mut invested_tokens: HashSet<String> = match binance.get_open_order_symbols().await {
+        Ok(symbols) => symbols.into_iter().collect(),
+        Err(e) => {
+            error!("Failed to fetch open order symbols: {}", e);
+            HashSet::new()
+        }
+    };
+
+    // ✅ Add currently held tokens (wallet spot balances turned into pairs)
+    match binance.get_spot_balances().await {
+        Ok(holdings) => {
+            let held_pairs = expand_holdings_to_pairs(&holdings, assets);
+            for pair in held_pairs {
+                invested_tokens.insert(pair);
+            }
+        }
+        Err(e) => {
+            error!("Failed to fetch spot balances: {}", e);
+        }
+    }
 
     let all_tickers = match binance.get_all_ticker_24hr().await {
         Ok(tickers) => tickers,
@@ -29,18 +45,6 @@ pub async fn discover_signals(
         }
     };
 
-     // ✅ Get all open order symbols
-     let invested_tokens: HashSet<String> = match binance.get_open_order_symbols().await {
-        Ok(symbols) => symbols.into_iter().collect(),
-        Err(e) => {
-            error!("Failed to fetch open order symbols: {}", e);
-            HashSet::new()
-        }
-    };
-
-
-    //reduced scope
-    // ✅ Keep only symbols with valid priceChangePercent and not already invested
     let tradable_tokens: Vec<(String, f64)> = all_tickers
         .into_iter()
         .filter_map(|ticker| {
@@ -84,6 +88,21 @@ pub async fn discover_signals(
             .collect();
 
         for symbol in candidates {
+           /*  
+           let supported = match binance.symbol_supports_order_type(&symbol, "TRAILING_STOP_MARKET").await {
+                Ok(v) => v,
+                Err(e) => {
+                    error!("Could not verify order support for {}: {}", symbol, e);
+                    false
+                }
+            };
+
+            if !supported {
+                continue;
+            }
+
+            */
+
             match binance.get_klines(&symbol, "1h", lookback).await {
                 Ok(klines) => {
                     if let Some(signal) = evaluate_klines(
@@ -102,12 +121,10 @@ pub async fn discover_signals(
             }
         }
     }
-
     signals
 }
 
-fn evaluate_klines(symbol: &str,klines: &[Vec<Value>],lookback: u32,recent: u32,trend: TrendDirection,) -> Option<Signal> 
-{
+fn evaluate_klines(symbol: &str,klines: &[Vec<Value>],lookback: u32,recent: u32,trend: TrendDirection,) -> Option<Signal> {
     if klines.len() < lookback as usize {
         return None;
     }
@@ -166,4 +183,20 @@ fn calculate_fluctuations(klines: &[Vec<Value>]) -> (f64, f64) {
     let avg_pct = pct.iter().sum::<f64>() / pct.len().max(1) as f64;
 
     (avg_raw, avg_pct)
+}
+
+pub fn expand_holdings_to_pairs( holdings: &[(String, f64)], quote_assets: &[String],) -> Vec<String> {
+    let mut pairs = Vec::new();
+
+    for (base, amount) in holdings {
+        if *amount > 0.0 {
+            for quote in quote_assets {
+                if base != quote {
+                    pairs.push(format!("{}{}", base, quote));
+                }
+            }
+        }
+    }
+
+    pairs
 }

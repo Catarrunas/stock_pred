@@ -18,7 +18,10 @@ pub struct Config {
     pub bt_stop_loss_options: Vec<u16>,
     pub order_update_interval: u64,
     pub quote_assets: Vec<String>,
-    pub transaction_amounts: Vec<f64>
+    pub transaction_amounts: Vec<f64>,
+    pub max_loss_day: u32,
+    pub stop_loss_loop_seconds: u64,
+    pub excluded_assets_spot: Vec<String>,
 }
 
 impl Config {
@@ -81,6 +84,20 @@ impl Config {
             .split(',')
             .filter_map(|s| s.trim().parse::<f64>().ok())
             .collect::<Vec<f64>>();
+        let max_loss_day = env::var("MAX_LOSS_DAY")
+            .unwrap_or_else(|_| "5".to_string())
+            .parse::<u32>()
+            .unwrap_or(5);
+        let stop_loss_loop_seconds = env::var("LOOP_TIME_STOP_LOSS")
+            .unwrap_or_else(|_| "900".to_string())
+            .parse::<u64>()
+            .unwrap_or(900);
+    let excluded_assets_spot = env::var("EXCLUDED_ASSETS_SPOT")
+            .unwrap_or_else(|_| "".to_string())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>();
 
         Config {
             transaction_amount,
@@ -95,6 +112,9 @@ impl Config {
             order_update_interval,
             quote_assets,
             transaction_amounts,
+            max_loss_day,
+            stop_loss_loop_seconds,
+            excluded_assets_spot,
         }
     }
 }
