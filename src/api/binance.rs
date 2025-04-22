@@ -787,7 +787,7 @@ impl Binance {
             info!("✅ STOP_LOSS_LIMIT order placed: {:?}", parsed);
             Ok(order_id)
         } else {
-            eprintln!("❌ Failed to place STOP_LOSS_LIMIT order: {}", body);
+            eprintln!("❌ Failed to place STOP_LOSS_LIMIT for symbol {} order: {}", symbol, body);
             Err(Box::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to place stop loss limit order",
@@ -798,7 +798,8 @@ impl Binance {
     /// Periodically check held spot tokens and ensure a stop-loss is in place or updated.
     pub async fn manage_stop_loss_limit_loop(&self) {
         loop {
-            println!("🔁 Starting stop-loss management loop");
+            let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
+            println!("🔁 [{}] Starting stop-loss management loop", timestamp);
             info!("🔁 Starting stop-loss management loop");
             let balances = match self.get_spot_balances().await {
                 Ok(b) => b,
@@ -870,9 +871,9 @@ impl Binance {
                             let quantity = Binance::round_to_step(balance, filters.step_size);
                             let notional = stop_price * quantity;
     
-                            if quantity < filters.min_qty || stop_price <= 0.0 || stop_price < filters.min_price || notional < filters.min_notional {
-                                println!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
-                                info!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
+                            if quantity < 1.0 || quantity < filters.min_qty || stop_price <= 0.0 || stop_price < filters.min_price || notional < filters.min_notional {
+                                //println!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
+                                //info!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
                                 continue;
                             }
     
@@ -885,7 +886,7 @@ impl Binance {
                             }
                         }
                         Err(e) => {
-                            println!("❌ Failed to fetch price for {}: {}", symbol, e);
+                            //println!("❌ Failed to fetch price for {}: {}", symbol, e);
                             error!("❌ Failed to fetch price for {}: {}", symbol, e);
                         }
                     }
@@ -964,8 +965,6 @@ impl Binance {
             sleep(Duration::from_secs(interval)).await;
         }
     }
-    
-    
 
     pub async fn get_symbol_filters(binance: &Binance, symbol: &str) -> Result<SymbolFilters, Error> {
         let url = format!("{}/exchangeInfo?symbol={}", binance.base_url, symbol);
