@@ -45,11 +45,18 @@ pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_
         }
     };
 
+    let min_volume = {
+        let cfg = SHARED_CONFIG.read().unwrap();
+        cfg.min_volume as f64
+    };
+
+
     let tradable_tokens: Vec<(String, f64)> = all_tickers
         .into_iter()
         .filter_map(|ticker| {
+            let volume = ticker.quote_volume.parse::<f64>().unwrap_or(0.0);
             ticker.priceChangePercent.parse::<f64>().ok().and_then(|change| {
-                if !invested_tokens.contains(&ticker.symbol) {
+                if volume >= min_volume && !invested_tokens.contains(&ticker.symbol) {
                     Some((ticker.symbol, change))
                 } else {
                     None

@@ -23,6 +23,7 @@ use std::collections::HashMap;
 use tokio::time::Duration;
 use tokio::time::sleep;
 use reqwest::Error as ReqwestError;         
+use crate::types::PURCHASE_PRICES;
 use std::error::Error as StdError;      
 
 #[derive(Debug, Clone, Default)]
@@ -91,6 +92,8 @@ pub struct AccountInfo {
 pub struct Ticker24hr {
     pub symbol: String,
     pub priceChangePercent: String,
+    #[serde(rename = "quoteVolume")]
+    pub quote_volume: String,
     // Add additional fields if needed.
 }
 
@@ -470,7 +473,7 @@ impl Binance {
     
         // Wait briefly to ensure balance is updated on Binance's end
        // 1. Place market buy
-        let buy_order_id = self.place_market_buy_order(symbol, quantity).await?;
+        let _buy_order_id = self.place_market_buy_order(symbol, quantity).await?;
 
         // 2. Wait briefly for wallet to update
         tokio::time::sleep(Duration::from_secs(10)).await;
@@ -796,7 +799,7 @@ impl Binance {
     }
 
     /// Periodically check held spot tokens and ensure a stop-loss is in place or updated.
-    pub async fn manage_stop_loss_limit_loop(&self) {
+    pub async fn manage_stop_loss_limit_loop_old(&self) {
         loop {
             let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
             println!("🔁 [{}] Starting stop-loss management loop", timestamp);
@@ -966,6 +969,185 @@ impl Binance {
         }
     }
 
+    pub async fn manage_stop_loss_limit_loop(&self) {
+        loop {
+            let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
+            println!("🔁 [{}] Starting stop-loss management loop", timestamp);
+            info!("🔁 [{}] Starting stop-loss management loop", timestamp);
+    
+            let balances = match self.get_spot_balances().await {
+                Ok(b) => b,
+                Err(e) => {
+                    error!("Failed to fetch balances: {}", e);
+                    println!("❌ Failed to fetch balances: {}", e);
+                    sleep(Duration::from_secs(60)).await;
+                    continue;
+                }
+            };
+    
+            let quote_assets = {
+                let cfg = SHARED_CONFIG.read().unwrap();
+                cfg.quote_assets.clone()
+            };
+    
+            let open_orders = match self.get_open_orders().await {
+                Ok(orders) => orders,
+                Err(e) => {
+                    error!("Failed to fetch full open orders: {}", e);
+                    println!("❌ Failed to fetch full open orders: {}", e);
+                    vec![]
+                }
+            };
+    
+            let trailing_stop_symbols: HashSet<String> = open_orders
+                .iter()
+                .filter(|o| o.type_field == "TRAILING_STOP_MARKET")
+                .map(|o| o.symbol.clone())
+                .collect();
+    
+            let stop_limit_symbols: HashSet<String> = open_orders
+                .iter()
+                .filter(|o| o.type_field == "STOP_LOSS_LIMIT")
+                .map(|o| o.symbol.clone())
+                .collect();
+    
+            let active_symbols: HashSet<String> = stop_limit_symbols.union(&trailing_stop_symbols).cloned().collect();
+    
+            // Clean up purchase prices for tokens no longer in open orders
+            {
+                let mut purchase_prices = PURCHASE_PRICES.lock().await;
+                purchase_prices.retain(|symbol, _| active_symbols.contains(symbol));
+            }
+    
+            // PLACE INITIAL STOP-LOSS IF NONE EXISTS
+            for (asset, balance) in balances {
+                if quote_assets.contains(&asset) {
+                    continue;
+                }
+    
+                for quote in &quote_assets {
+                    let symbol = format!("{}{}", asset, quote);
+    
+                    if trailing_stop_symbols.contains(&symbol) || stop_limit_symbols.contains(&symbol) {
+                        continue;
+                    }
+    
+                    let price = match self.get_price(&symbol).await {
+                        Ok(p) => p,
+                        Err(_) => continue,
+                    };
+    
+                    let filters = match Binance::get_symbol_filters(self, &symbol).await {
+                        Ok(f) => f,
+                        Err(_) => continue,
+                    };
+    
+                    let stop_loss_percent = SHARED_CONFIG.read().unwrap().stop_loss_percent;
+                    let stop_price = Binance::round_to_step(price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
+                    let quantity = Binance::round_to_step(balance, filters.step_size);
+                    let notional = stop_price * quantity;
+    
+                    if quantity < 1.0 || quantity < filters.min_qty || stop_price <= 0.0 || stop_price < filters.min_price || notional < filters.min_notional {
+                        continue;
+                    }
+    
+                    println!("🔒 Placing initial stop-loss for {} at {:.4}", symbol, stop_price);
+                    if let Err(e) = self.place_stop_loss_limit_order(&symbol, quantity, stop_price, stop_price).await {
+                        println!("❌ Failed to place stop-loss for {}: {}", symbol, e);
+                    }
+                }
+            }
+    
+            // UPDATE STOP-LOSS IF ABOVE BREAK-EVEN
+            for order in open_orders.iter().filter(|o| o.type_field == "STOP_LOSS_LIMIT") {
+                let symbol = &order.symbol;
+    
+                if trailing_stop_symbols.contains(symbol) {
+                    continue;
+                }
+    
+                let filters = match Binance::get_symbol_filters(self, symbol).await {
+                    Ok(f) => f,
+                    Err(e) => {
+                        println!("❌ Failed to fetch filters for {}: {}", symbol, e);
+                        continue;
+                    }
+                };
+    
+                let current_price = match self.get_price(symbol).await {
+                    Ok(p) => p,
+                    Err(e) => {
+                        println!("❌ Failed to fetch price for {}: {}", symbol, e);
+                        continue;
+                    }
+                };
+    
+                let mut purchase_prices = PURCHASE_PRICES.lock().await;
+                let purchase_price = match purchase_prices.get(symbol) {
+                    Some(p) => *p,
+                    None => {
+                        match self.get_last_buy_price(symbol).await {
+                            Ok(Some(price)) => {
+                                println!("💾 [{}] Backfilled purchase price for {}: {:.4}", timestamp, symbol, price);
+                                purchase_prices.insert(symbol.clone(), price);
+                                price
+                            }
+                            _ => {
+                                println!("⚠️ No purchase price found for {}. Skipping...", symbol);
+                                continue;
+                            }
+                        }
+                    }
+                };
+    
+                let stop_loss_percent = {
+                    let cfg = SHARED_CONFIG.read().unwrap();
+                    if current_price >= purchase_price * 1.05 {
+                        cfg.stop_loss_percent_profit
+                    } else {
+                        continue; // Don't re-update 10% stop
+                    }
+                };
+    
+                let stop_price = Binance::round_to_step(current_price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
+                let existing_stop = order.stop_price.parse::<f64>().unwrap_or(0.0);
+                let rounded_existing = Binance::round_to_step(existing_stop, filters.tick_size);
+                let rounded_new = Binance::round_to_step(stop_price, filters.tick_size);
+    
+                if rounded_new > rounded_existing {
+                    let quantity = Binance::round_to_step(order.orig_qty.parse::<f64>().unwrap_or(0.0), filters.step_size);
+    
+                    println!("📊 {} current: {:.4}, purchase: {:.4}, existing stop: {:.4}, new stop: {:.4}", symbol, current_price, purchase_price, existing_stop, stop_price);
+    
+                    if let Err(e) = self.cancel_order(symbol, order.order_id).await {
+                        println!("❌ Failed to cancel old stop-loss for {}: {}", symbol, e);
+                        continue;
+                    }
+    
+                    if let Err(e) = self.place_stop_loss_limit_order(symbol, quantity, stop_price, stop_price).await {
+                        println!("❌ Failed to update stop-loss for {}: {}", symbol, e);
+                    } else {
+                        println!("✅ Updated stop-loss for {} to {:.4}% ({} → {})", symbol, stop_loss_percent, existing_stop, stop_price);
+                    }
+                } else {
+                    println!("✅ No update needed for {} — stop {:.4} is still valid", symbol, existing_stop);
+                }
+            }
+    
+            let interval = {
+                let cfg = SHARED_CONFIG.read().unwrap();
+                cfg.stop_loss_loop_seconds
+            };
+    
+            println!("⏱ Sleeping {} seconds before next stop-loss check", interval);
+            sleep(Duration::from_secs(interval)).await;
+        }
+    }
+    
+    
+    
+    
+    
     pub async fn get_symbol_filters(binance: &Binance, symbol: &str) -> Result<SymbolFilters, Error> {
         let url = format!("{}/exchangeInfo?symbol={}", binance.base_url, symbol);
         let response = binance.client.get(&url).send().await?;
@@ -1130,6 +1312,25 @@ impl Binance {
     
         let trades: Vec<serde_json::Value> = response.json().await?;
         Ok(trades)
+    }
+
+    pub async fn get_last_buy_price(&self, symbol: &str) -> Result<Option<f64>, Box<dyn StdError>> {
+        let trades = self.get_spot_trade_history(symbol, None, None).await?;
+    
+        let last_buy = trades
+            .iter()
+            .rev()
+            .find(|t| t["isBuyer"].as_bool() == Some(true));
+    
+        if let Some(trade) = last_buy {
+            if let Some(price_str) = trade["price"].as_str() {
+                if let Ok(price) = price_str.parse::<f64>() {
+                    return Ok(Some(price));
+                }
+            }
+        }
+    
+        Ok(None)
     }
 }
 

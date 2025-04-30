@@ -1,7 +1,47 @@
 use dotenv::from_filename;
 use std::env;
 use tracing_subscriber;
+use std::fs::{OpenOptions, create_dir_all};
+use std::io::Write;
+use chrono::Utc;
 
+pub fn log_trade_event(
+    symbol: &str,
+    action: &str,
+    price: f64,
+    qty: f64,
+    quote: f64,
+    stop_loss: f64,
+    reason: &str,
+) {
+    let timestamp = Utc::now().to_rfc3339();
+    let date = Utc::now().format("%Y-%m-%d").to_string();
+     // Load environment variables from vars.env.
+    let _ = from_filename("vars.env");
+     // Read log file settings from the environment.
+    let folder = env::var("TRADE_LOG_FOLDER").unwrap_or_else(|_| "trade_log".to_string());
+    let path = format!("{}/{}.csv", folder, date);
+
+    let row = format!(
+        "{},{},{:.4},{:.4},{:.4},{:.4},{},{}\n",
+        timestamp, symbol, action, price, qty, quote, stop_loss, reason
+    );
+
+    std::thread::spawn(move || {
+        if let Err(e) = create_dir_all(&folder) {
+            eprintln!("❌ Failed to create log dir: {}", e);
+            return;
+        }
+
+        if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) {
+            if let Err(e) = file.write_all(row.as_bytes()) {
+                eprintln!("❌ Failed to write log row: {}", e);
+            }
+        } else {
+            eprintln!("❌ Could not open log file: {}", path);
+        }
+    });
+}
 
 /// Initialize tracing
 pub fn init_tracing(

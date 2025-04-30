@@ -22,6 +22,8 @@ pub struct Config {
     pub max_loss_day: u32,
     pub stop_loss_loop_seconds: u64,
     pub excluded_assets_spot: Vec<String>,
+    pub min_volume: u64,
+    pub stop_loss_percent_profit: f64,
 }
 
 impl Config {
@@ -92,12 +94,20 @@ impl Config {
             .unwrap_or_else(|_| "900".to_string())
             .parse::<u64>()
             .unwrap_or(900);
-    let excluded_assets_spot = env::var("EXCLUDED_ASSETS_SPOT")
-            .unwrap_or_else(|_| "".to_string())
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect::<Vec<_>>();
+        let excluded_assets_spot = env::var("EXCLUDED_ASSETS_SPOT")
+                .unwrap_or_else(|_| "".to_string())
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect::<Vec<_>>();
+        let min_volume = env::var("MIN_VOLUME_USD")
+            .unwrap_or_else(|_| "500000".to_string())
+            .parse()
+            .unwrap_or(500000);
+        let stop_loss_percent_profit = env::var("STOP_LOSS_PERCENT_DEFAULT")
+            .unwrap_or_else(|_| "10".to_string())
+            .parse::<f64>()
+            .unwrap_or(10.0);
 
         Config {
             transaction_amount,
@@ -115,6 +125,8 @@ impl Config {
             max_loss_day,
             stop_loss_loop_seconds,
             excluded_assets_spot,
+            min_volume,
+            stop_loss_percent_profit,
         }
     }
 }

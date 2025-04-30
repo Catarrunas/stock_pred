@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::time::Instant;
 use chrono::NaiveDate;
 use chrono::Utc;
+use std::collections::HashMap;
+use tokio::sync::Mutex;
+use lazy_static::lazy_static;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OpenOrder {
@@ -67,6 +70,10 @@ pub struct GlobalLossTracker {
     pub consecutive_losses: u32,
     pub last_reset_date: NaiveDate,
     pub cooldown_until: Option<Instant>,
+}
+
+lazy_static! {
+    pub static ref PURCHASE_PRICES: Mutex<HashMap<String, f64>> = Mutex::new(HashMap::new());
 }
 
 impl GlobalLossTracker {

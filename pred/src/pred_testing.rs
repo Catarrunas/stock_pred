@@ -1,7 +1,4 @@
 use stock_pred::api::binance::Binance;
-use stock_pred::types::TrendDirection;
-use stock_pred::config::SHARED_CONFIG;
-use stock_pred::trading::discovery::discover_signals;
 
 #[tokio::main]
 async fn main() {
