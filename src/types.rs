@@ -4,6 +4,7 @@ use chrono::NaiveDate;
 use chrono::Utc;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 use lazy_static::lazy_static;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -74,6 +75,7 @@ pub struct GlobalLossTracker {
 
 lazy_static! {
     pub static ref PURCHASE_PRICES: Mutex<HashMap<String, f64>> = Mutex::new(HashMap::new());
+    pub static ref MARKET_TREND: RwLock<String> = RwLock::new("Unknown".to_string());
 }
 
 impl GlobalLossTracker {

@@ -7,6 +7,7 @@ use serde_json::Value;
 use log::{info, error};
 use crate::api::binance::Binance;
 use std::collections::HashSet;
+use crate::types::MARKET_TREND;
 
 pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_amounts: &[f64], trend: TrendDirection,) -> Vec<Signal> {
     let mut signals = Vec::new();
@@ -44,6 +45,36 @@ pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_
             return signals;
         }
     };
+    let positive_count = all_tickers.iter()
+    .filter(|t| t.priceChangePercent.parse::<f64>().unwrap_or(0.0) > 0.0)
+    .count();
+    let total = all_tickers.len();
+    let ratio = positive_count as f64 / total as f64;
+
+    let trend_str = if ratio >= 0.5 {
+        "Positive"
+    } else {
+        "Negative"
+    };
+
+    let mut mt = MARKET_TREND.write().await;
+    *mt = trend_str.to_string();
+
+    /* match trend {
+        TrendDirection::Positive => {
+            if ratio < 0.5 {
+                println!("📉 Market is negative ({:.1}% green). Skipping Positive trend trades.", ratio * 100.0);
+                return signals;
+            }
+        }
+        TrendDirection::Negative => {
+            if ratio > 0.5 {
+                println!("📈 Market is positive ({:.1}% green). Skipping Negative trend trades.", ratio * 100.0);
+                return signals;
+            }
+        }
+    }
+    */
 
     let min_volume = {
         let cfg = SHARED_CONFIG.read().unwrap();
@@ -148,9 +179,33 @@ fn evaluate_klines(symbol: &str,klines: &[Vec<Value>],lookback: u32,recent: u32,
     let recent_close = parse_f64(&recent_candles.last().unwrap()[4])?;
     let recent_growth = ((recent_close - recent_open) / recent_open) * 100.0;
 
-    let valid = match trend {
-        TrendDirection::Positive => overall_growth >= 10.0 && current_trend_up && recent_growth > 0.0,
-        TrendDirection::Negative => overall_growth <= -10.0 && !current_trend_up && recent_growth < 0.0,
+    // 2 strong green candles check
+    let last2_open = parse_f64(&klines[klines.len() - 2][1])?;
+    let last2_close = parse_f64(&klines[klines.len() - 2][4])?;
+    let last1_open = parse_f64(&klines[klines.len() - 1][1])?;
+    let last1_close = last_close;
+    let last2_pct = ((last2_close - last2_open) / last2_open) * 100.0;
+    let last1_pct = ((last1_close - last1_open) / last1_open) * 100.0;
+
+    let two_strong_green =
+        last2_close > last2_open &&
+        last1_close > last1_open &&
+        last2_pct >= 0.5 &&
+        last1_pct >= 0.5;
+
+     // Final validation
+     let valid = match trend {
+        TrendDirection::Positive => {
+            overall_growth >= 10.0 &&
+            current_trend_up &&
+            recent_growth > 0.0 &&
+            two_strong_green
+        },
+        TrendDirection::Negative => {
+            overall_growth <= -10.0 &&
+            !current_trend_up &&
+            recent_growth < 0.0
+        },
     };
 
     if !valid {

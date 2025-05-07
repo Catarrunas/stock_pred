@@ -1,0 +1,392 @@
+2025-04-22T00:24:45.737965Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Starting stop-loss management loop
+2025-04-22T00:24:46.861796Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.7300, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:47.145723Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T00:24:47.452998Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T00:24:47.678842Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T00:24:48.172069Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SYNUSDC — stop 0.1905, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:48.734513Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0431
+2025-04-22T00:24:48.961003Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T00:24:49.421655Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0600
+2025-04-22T00:24:49.645894Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T00:24:50.141697Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for POLUSDC at 0.1883
+2025-04-22T00:24:50.368581Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T00:24:50.821312Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping CATIUSDC — stop 0.0798, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:51.346840Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TURBOUSDC — stop 0.0021, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:51.963472Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping ACTUSDC — stop 0.0532, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:52.473112Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping COOKIEUSDC — stop 0.0942, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:52.966370Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping GUNUSDC — stop 0.0564, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:53.420248Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping BABYUSDC — stop 0.0801, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T00:24:53.874075Z  INFO tokio-runtime-worker ThreadId(11) 📊 TNSRUSDC market price: 0.1498, current stop: 0.1424, new stop: 0.1423
+2025-04-22T00:24:53.874274Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for TNSRUSDC — stop 0.1424 is still valid
+2025-04-22T00:24:55.239808Z  INFO tokio-runtime-worker ThreadId(11) 📊 SHELLUSDC market price: 0.1486, current stop: 0.1458, new stop: 0.1411
+2025-04-22T00:24:55.239999Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for SHELLUSDC — stop 0.1458 is still valid
+2025-04-22T00:24:56.180327Z  INFO tokio-runtime-worker ThreadId(11) 📊 STXUSDC market price: 0.7100, current stop: 0.6810, new stop: 0.6740
+2025-04-22T00:24:56.180528Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for STXUSDC — stop 0.6810 is still valid
+2025-04-22T00:24:56.180625Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T01:07:48.196398Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T01:07:49.240307Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.7000, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:49.463979Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:07:49.727919Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:07:49.998673Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:07:50.450902Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SYNUSDC — stop 0.1950, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:50.907401Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0429
+2025-04-22T01:07:51.136042Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T01:07:51.677321Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0800
+2025-04-22T01:07:51.982679Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T01:07:52.435816Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for POLUSDC at 0.1877
+2025-04-22T01:07:52.664536Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T01:07:53.213645Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping CATIUSDC — stop 0.0803, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:53.729993Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TURBOUSDC — stop 0.0021, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:54.329359Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping ACTUSDC — stop 0.0539, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:54.881758Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping COOKIEUSDC — stop 0.0958, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:55.588832Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping GUNUSDC — stop 0.0563, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:56.270598Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping BABYUSDC — stop 0.0795, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:07:56.776636Z  INFO tokio-runtime-worker ThreadId(11) 📊 TNSRUSDC market price: 0.1562, current stop: 0.1424, new stop: 0.1483
+2025-04-22T01:07:56.776811Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Updating stop-loss for TNSRUSDC from 0.1424 to 0.1483
+2025-04-22T01:07:57.380370Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("LRf32wLf3QX8moy5BhSHaX"), "orderId": Number(73014265), "orderListId": Number(-1), "symbol": String("TNSRUSDC"), "transactTime": Number(1745284077263)}
+2025-04-22T01:07:58.004534Z  INFO tokio-runtime-worker ThreadId(11) 📊 STXUSDC market price: 0.7460, current stop: 0.6810, new stop: 0.7080
+2025-04-22T01:07:58.004730Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Updating stop-loss for STXUSDC from 0.6810 to 0.7080
+2025-04-22T01:07:58.613856Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("Cm9Jrnams486lknQs6SYHS"), "orderId": Number(56386086), "orderListId": Number(-1), "symbol": String("STXUSDC"), "transactTime": Number(1745284078408)}
+2025-04-22T01:07:59.322250Z  INFO tokio-runtime-worker ThreadId(11) 📊 SHELLUSDC market price: 0.1495, current stop: 0.1458, new stop: 0.1420
+2025-04-22T01:07:59.322283Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for SHELLUSDC — stop 0.1458 is still valid
+2025-04-22T01:07:59.322295Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T01:08:16.992875Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-22 01:08:16] Starting market scan...    
+2025-04-22T01:08:17.267451Z  INFO tokio-runtime-worker ThreadId(12) 📘 Open Order: STXUSDC | Side: SELL | Qty: 14.00000000 | Price: 0.70800000 | Type: STOP_LOSS_LIMIT
+2025-04-22T01:08:17.267698Z  INFO tokio-runtime-worker ThreadId(12) 📘 Open Order: TNSRUSDC | Side: SELL | Qty: 69.20000000 | Price: 0.14830000 | Type: STOP_LOSS_LIMIT
+2025-04-22T01:08:17.267783Z  INFO tokio-runtime-worker ThreadId(12) 📘 Open Order: SHELLUSDC | Side: SELL | Qty: 68.20000000 | Price: 0.14580000 | Type: STOP_LOSS_LIMIT
+2025-04-22T01:12:51.599615Z  INFO tokio-runtime-worker ThreadId(10) ❌ Failed to execute trade for token DUSKUSDC : Price for DUSKUSDC could not be parsed or was zero
+2025-04-22T01:12:52.131298Z  INFO tokio-runtime-worker ThreadId(10) Calculated quantity for RSRUSDC at 0.008293 price: 1205.836240 units for 10.00 USDC
+2025-04-22T01:12:52.131367Z  INFO tokio-runtime-worker ThreadId(10) 📈 Executing market buy for RSRUSDC with 1205.800000 units (10 quote)
+2025-04-22T01:12:52.357521Z  INFO tokio-runtime-worker ThreadId(10) ✅ Market buy order placed: Object {"clientOrderId": String("hOOauYjEs9uxxhCiom4KCq"), "cummulativeQuoteQty": String("10.00814000"), "executedQty": String("1205.80000000"), "fills": Array [Object {"commission": String("1.14551000"), "commissionAsset": String("RSR"), "price": String("0.00830000"), "qty": String("1205.80000000"), "tradeId": Number(1148327)}], "orderId": Number(78076318), "orderListId": Number(-1), "origQty": String("1205.80000000"), "origQuoteOrderQty": String("0.00000000"), "price": String("0.00000000"), "selfTradePreventionMode": String("EXPIRE_MAKER"), "side": String("BUY"), "status": String("FILLED"), "symbol": String("RSRUSDC"), "timeInForce": String("GTC"), "transactTime": Number(1745284372280), "type": String("MARKET"), "workingTime": Number(1745284372280)}
+2025-04-22T01:13:03.048599Z  INFO tokio-runtime-worker ThreadId(10) 📉 Using STOP_LOSS_LIMIT for RSRUSDC
+2025-04-22T01:13:03.275626Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("cPWwFJkKnvVNRkcCvWYnhC"), "orderId": Number(78076464), "orderListId": Number(-1), "symbol": String("RSRUSDC"), "transactTime": Number(1745284383199)}
+2025-04-22T01:13:03.275851Z  INFO tokio-runtime-worker ThreadId(10) ✅ Trade + stop setup complete for RSRUSDC
+2025-04-22T01:13:03.784632Z  INFO tokio-runtime-worker ThreadId(10) Calculated quantity for PARTIUSDC at 0.184600 price: 54.171180 units for 10.00 USDC
+2025-04-22T01:13:03.784993Z  INFO tokio-runtime-worker ThreadId(10) 📈 Executing market buy for PARTIUSDC with 54.100000 units (10 quote)
+2025-04-22T01:13:04.013882Z  INFO tokio-runtime-worker ThreadId(10) ✅ Market buy order placed: Object {"clientOrderId": String("iUDqWXL1xHg37xupynyoNY"), "cummulativeQuoteQty": String("10.00309000"), "executedQty": String("54.10000000"), "fills": Array [Object {"commission": String("0.05139500"), "commissionAsset": String("PARTI"), "price": String("0.18490000"), "qty": String("54.10000000"), "tradeId": Number(236699)}], "orderId": Number(11588814), "orderListId": Number(-1), "origQty": String("54.10000000"), "origQuoteOrderQty": String("0.00000000"), "price": String("0.00000000"), "selfTradePreventionMode": String("EXPIRE_MAKER"), "side": String("BUY"), "status": String("FILLED"), "symbol": String("PARTIUSDC"), "timeInForce": String("GTC"), "transactTime": Number(1745284383935), "type": String("MARKET"), "workingTime": Number(1745284383935)}
+2025-04-22T01:13:14.765945Z  INFO tokio-runtime-worker ThreadId(11) 📉 Using STOP_LOSS_LIMIT for PARTIUSDC
+2025-04-22T01:13:14.992790Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("uf6btYQ5HWfvcFcS9pO2Nw"), "orderId": Number(11588860), "orderListId": Number(-1), "symbol": String("PARTIUSDC"), "transactTime": Number(1745284394917)}
+2025-04-22T01:13:14.993016Z  INFO tokio-runtime-worker ThreadId(11) ✅ Trade + stop setup complete for PARTIUSDC
+2025-04-22T01:13:15.560857Z  INFO tokio-runtime-worker ThreadId(11) Calculated quantity for MUBARAKUSDC at 0.030900 price: 323.624590 units for 10.00 USDC
+2025-04-22T01:13:15.561238Z  INFO tokio-runtime-worker ThreadId(11) 📈 Executing market buy for MUBARAKUSDC with 323.600000 units (10 quote)
+2025-04-22T01:13:15.870086Z  INFO tokio-runtime-worker ThreadId(11) ✅ Market buy order placed: Object {"clientOrderId": String("i4cq1ZfCZCDUdHw8bf4gLL"), "cummulativeQuoteQty": String("10.06396000"), "executedQty": String("323.60000000"), "fills": Array [Object {"commission": String("0.30742000"), "commissionAsset": String("MUBARAK"), "price": String("0.03110000"), "qty": String("323.60000000"), "tradeId": Number(91759)}], "orderId": Number(4591316), "orderListId": Number(-1), "origQty": String("323.60000000"), "origQuoteOrderQty": String("0.00000000"), "price": String("0.00000000"), "selfTradePreventionMode": String("EXPIRE_MAKER"), "side": String("BUY"), "status": String("FILLED"), "symbol": String("MUBARAKUSDC"), "timeInForce": String("GTC"), "transactTime": Number(1745284395712), "type": String("MARKET"), "workingTime": Number(1745284395712)}
+2025-04-22T01:13:26.561655Z  INFO tokio-runtime-worker ThreadId(12) 📉 Using STOP_LOSS_LIMIT for MUBARAKUSDC
+2025-04-22T01:13:26.787025Z  INFO tokio-runtime-worker ThreadId(12) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("TXFUnX2KAv4o6ZXH7FBsAh"), "orderId": Number(4591407), "orderListId": Number(-1), "symbol": String("MUBARAKUSDC"), "transactTime": Number(1745284406710)}
+2025-04-22T01:13:26.787222Z  INFO tokio-runtime-worker ThreadId(12) ✅ Trade + stop setup complete for MUBARAKUSDC
+2025-04-22T01:13:26.787374Z  INFO tokio-runtime-worker ThreadId(12) Sleeping for 3600 seconds before the next iteration...
+2025-04-22T01:37:53.032699Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T01:37:54.070838Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping AVAXUSDC — stop 19.0100, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:54.294776Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:37:54.520741Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:37:54.745738Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T01:37:55.195589Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping SYNUSDC — stop 0.1970, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:55.666267Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0428
+2025-04-22T01:37:55.892259Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T01:37:56.346296Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for OMNIUSDC at 2.1000
+2025-04-22T01:37:56.574096Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T01:37:57.073914Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for POLUSDC at 0.1897
+2025-04-22T01:37:57.300038Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T01:37:57.753621Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping CATIUSDC — stop 0.0813, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:58.304117Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:58.754558Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping ACTUSDC — stop 0.0543, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:59.206121Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping COOKIEUSDC — stop 0.0982, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:37:59.700967Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping GUNUSDC — stop 0.0574, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:38:00.248389Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping BABYUSDC — stop 0.0794, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T01:38:00.760233Z  INFO tokio-runtime-worker ThreadId(10) 📊 SHELLUSDC market price: 0.1495, current stop: 0.1458, new stop: 0.1420
+2025-04-22T01:38:00.760419Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for SHELLUSDC — stop 0.1458 is still valid
+2025-04-22T01:38:01.220726Z  INFO tokio-runtime-worker ThreadId(10) 📊 PARTIUSDC market price: 0.1835, current stop: 0.1756, new stop: 0.1743
+2025-04-22T01:38:01.220931Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for PARTIUSDC — stop 0.1756 is still valid
+2025-04-22T01:38:01.674059Z  INFO tokio-runtime-worker ThreadId(10) 📊 MUBARAKUSDC market price: 0.0311, current stop: 0.0295, new stop: 0.0295
+2025-04-22T01:38:01.674172Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for MUBARAKUSDC from 0.0295 to 0.0295
+2025-04-22T01:38:02.130800Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("VYmhpr7l2jNDWMNT0fhCmw"), "orderId": Number(4597089), "orderListId": Number(-1), "symbol": String("MUBARAKUSDC"), "transactTime": Number(1745285882049)}
+2025-04-22T01:38:03.015633Z  INFO tokio-runtime-worker ThreadId(10) 📊 STXUSDC market price: 0.7590, current stop: 0.7080, new stop: 0.7210
+2025-04-22T01:38:03.015826Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for STXUSDC from 0.7080 to 0.7210
+2025-04-22T01:38:03.905369Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("wrqSvTuNLKawqNYSgB60NA"), "orderId": Number(56397189), "orderListId": Number(-1), "symbol": String("STXUSDC"), "transactTime": Number(1745285883825)}
+2025-04-22T01:38:05.215100Z  INFO tokio-runtime-worker ThreadId(10) 📊 TNSRUSDC market price: 0.1583, current stop: 0.1483, new stop: 0.1503
+2025-04-22T01:38:05.215303Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for TNSRUSDC from 0.1483 to 0.1503
+2025-04-22T01:38:05.683035Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("M0fBgptWfG4oIt4G7aEqAC"), "orderId": Number(73028369), "orderListId": Number(-1), "symbol": String("TNSRUSDC"), "transactTime": Number(1745285885604)}
+2025-04-22T01:38:06.187322Z  INFO tokio-runtime-worker ThreadId(10) 📊 RSRUSDC market price: 0.0084, current stop: 0.0079, new stop: 0.0079
+2025-04-22T01:38:06.187498Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for RSRUSDC from 0.0079 to 0.0079
+2025-04-22T01:38:06.717159Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("YdDAPrmYINbEAxcbM3MfRQ"), "orderId": Number(78092331), "orderListId": Number(-1), "symbol": String("RSRUSDC"), "transactTime": Number(1745285886638)}
+2025-04-22T01:38:06.717399Z  INFO tokio-runtime-worker ThreadId(10) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T02:27:54.451365Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T02:27:55.413849Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping AVAXUSDC — stop 18.9400, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:27:55.636507Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:27:55.862142Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:27:56.086170Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:27:56.538579Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping SYNUSDC — stop 0.1932, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:27:56.991272Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0447
+2025-04-22T02:27:57.217658Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T02:27:57.669277Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0800
+2025-04-22T02:27:57.895656Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T02:27:58.394267Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for POLUSDC at 0.1898
+2025-04-22T02:27:58.650613Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T02:27:59.193130Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping CATIUSDC — stop 0.0808, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:27:59.707516Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:00.217505Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping ACTUSDC — stop 0.0542, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:00.668303Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping COOKIEUSDC — stop 0.0968, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:01.240831Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping GUNUSDC — stop 0.0580, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:01.694584Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping PARTIUSDC — stop 0.1670, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:02.166953Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping BABYUSDC — stop 0.0793, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:28:02.626307Z  INFO tokio-runtime-worker ThreadId(10) 📊 STXUSDC market price: 0.7690, current stop: 0.7210, new stop: 0.7300
+2025-04-22T02:28:02.626481Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for STXUSDC from 0.7210 to 0.7300
+2025-04-22T02:28:03.081105Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("7M0remy6xuAGKU7depfey6"), "orderId": Number(56409934), "orderListId": Number(-1), "symbol": String("STXUSDC"), "transactTime": Number(1745288883015)}
+2025-04-22T02:28:03.530481Z  INFO tokio-runtime-worker ThreadId(10) 📊 RSRUSDC market price: 0.0084, current stop: 0.0079, new stop: 0.0080
+2025-04-22T02:28:03.530578Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for RSRUSDC from 0.0079 to 0.0080
+2025-04-22T02:28:04.406548Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("sfuddyjHhjBIAvShmtGOFk"), "orderId": Number(78118961), "orderListId": Number(-1), "symbol": String("RSRUSDC"), "transactTime": Number(1745288884342)}
+2025-04-22T02:28:04.948314Z  INFO tokio-runtime-worker ThreadId(10) 📊 TNSRUSDC market price: 0.1532, current stop: 0.1503, new stop: 0.1455
+2025-04-22T02:28:04.948490Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for TNSRUSDC — stop 0.1503 is still valid
+2025-04-22T02:28:05.829303Z  INFO tokio-runtime-worker ThreadId(10) 📊 SHELLUSDC market price: 0.1485, current stop: 0.1458, new stop: 0.1410
+2025-04-22T02:28:05.829438Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for SHELLUSDC — stop 0.1458 is still valid
+2025-04-22T02:28:06.707327Z  INFO tokio-runtime-worker ThreadId(10) 📊 MUBARAKUSDC market price: 0.0309, current stop: 0.0295, new stop: 0.0293
+2025-04-22T02:28:06.707519Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for MUBARAKUSDC — stop 0.0295 is still valid
+2025-04-22T02:28:06.707632Z  INFO tokio-runtime-worker ThreadId(10) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T02:51:28.277995Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T02:51:29.297825Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.9500, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:29.554325Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:51:29.778015Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:51:30.003857Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T02:51:30.456079Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SYNUSDC — stop 0.1975, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:30.909573Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0438
+2025-04-22T02:51:31.134282Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T02:51:32.100066Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0800
+2025-04-22T02:51:32.327493Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T02:51:32.782274Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for POLUSDC at 0.1900
+2025-04-22T02:51:33.008845Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T02:51:33.460650Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping CATIUSDC — stop 0.0806, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:33.915358Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:34.370055Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping ACTUSDC — stop 0.0539, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:34.825985Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping COOKIEUSDC — stop 0.0966, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:35.279616Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping GUNUSDC — stop 0.0581, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:35.748083Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping PARTIUSDC — stop 0.1677, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:36.202110Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping BABYUSDC — stop 0.0780, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T02:51:36.693144Z  INFO tokio-runtime-worker ThreadId(11) 📊 MUBARAKUSDC market price: 0.0315, current stop: 0.0295, new stop: 0.0299
+2025-04-22T02:51:36.693255Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Updating stop-loss for MUBARAKUSDC from 0.0295 to 0.0299
+2025-04-22T02:51:37.148711Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("0q4FZKh5QdtYLXged5YQZt"), "orderId": Number(4613342), "orderListId": Number(-1), "symbol": String("MUBARAKUSDC"), "transactTime": Number(1745290297114)}
+2025-04-22T02:51:37.602163Z  INFO tokio-runtime-worker ThreadId(11) 📊 RSRUSDC market price: 0.0085, current stop: 0.0080, new stop: 0.0080
+2025-04-22T02:51:37.602268Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Updating stop-loss for RSRUSDC from 0.0080 to 0.0080
+2025-04-22T02:51:38.054115Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("LmmNXx57OIqKKCuNOPfLwr"), "orderId": Number(78132759), "orderListId": Number(-1), "symbol": String("RSRUSDC"), "transactTime": Number(1745290298021)}
+2025-04-22T02:51:38.510855Z  INFO tokio-runtime-worker ThreadId(11) 📊 SHELLUSDC market price: 0.1465, current stop: 0.1458, new stop: 0.1391
+2025-04-22T02:51:38.511080Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for SHELLUSDC — stop 0.1458 is still valid
+2025-04-22T02:51:38.966912Z  INFO tokio-runtime-worker ThreadId(11) 📊 TNSRUSDC market price: 0.1569, current stop: 0.1503, new stop: 0.1490
+2025-04-22T02:51:38.967104Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for TNSRUSDC — stop 0.1503 is still valid
+2025-04-22T02:51:39.416969Z  INFO tokio-runtime-worker ThreadId(11) 📊 STXUSDC market price: 0.7680, current stop: 0.7300, new stop: 0.7290
+2025-04-22T02:51:39.417006Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T02:51:39.417020Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T03:25:51.243074Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T03:29:32.452847Z  INFO tokio-runtime-worker ThreadId(11) [2025-04-22 03:29:32] Starting market scan...    
+2025-04-22T03:29:32.734048Z  INFO tokio-runtime-worker ThreadId(10) 📘 Open Order: STXUSDC | Side: SELL | Qty: 14.00000000 | Price: 0.73000000 | Type: STOP_LOSS_LIMIT
+2025-04-22T03:29:32.734221Z  INFO tokio-runtime-worker ThreadId(10) 📘 Open Order: TNSRUSDC | Side: SELL | Qty: 69.20000000 | Price: 0.15030000 | Type: STOP_LOSS_LIMIT
+2025-04-22T03:29:32.734264Z  INFO tokio-runtime-worker ThreadId(10) 📘 Open Order: RSRUSDC | Side: SELL | Qty: 1204.50000000 | Price: 0.00800000 | Type: STOP_LOSS_LIMIT
+2025-04-22T03:29:34.940319Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.9000, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:29:35.173017Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T03:29:35.400698Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T03:29:35.627226Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T03:29:36.106301Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SYNUSDC — stop 0.2013, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:29:36.616285Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0434
+2025-04-22T03:29:36.900492Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T03:31:38.149625Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0700
+2025-04-22T03:31:38.376234Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T03:31:38.857169Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for POLUSDC at 0.1907
+2025-04-22T03:31:39.082124Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T03:31:39.547915Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping CATIUSDC — stop 0.0800, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:40.000397Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:40.453923Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping ACTUSDC — stop 0.0536, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:40.927848Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping COOKIEUSDC — stop 0.0982, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:41.380622Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SHELLUSDC — stop 0.1378, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:41.931681Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping GUNUSDC — stop 0.0594, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:42.544963Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping PARTIUSDC — stop 0.1677, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:43.080106Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0285
+2025-04-22T03:31:43.304596Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T03:31:43.758989Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping BABYUSDC — stop 0.0780, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T03:31:44.211425Z  INFO tokio-runtime-worker ThreadId(10) 📊 RSRUSDC market price: 0.0085, current stop: 0.0080, new stop: 0.0081
+2025-04-22T03:31:44.211477Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for RSRUSDC from 0.0080 to 0.0081
+2025-04-22T03:31:44.665420Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("RrfZKoQukPmpwxJ82BOAKc"), "orderId": Number(78153119), "orderListId": Number(-1), "symbol": String("RSRUSDC"), "transactTime": Number(1745292704621)}
+2025-04-22T03:31:45.118611Z  INFO tokio-runtime-worker ThreadId(10) 📊 STXUSDC market price: 0.7570, current stop: 0.7300, new stop: 0.7190
+2025-04-22T03:31:45.118773Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T03:31:45.572707Z  INFO tokio-runtime-worker ThreadId(10) 📊 TNSRUSDC market price: 0.1558, current stop: 0.1503, new stop: 0.1480
+2025-04-22T03:31:45.572837Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for TNSRUSDC — stop 0.1503 is still valid
+2025-04-22T03:31:45.572905Z  INFO tokio-runtime-worker ThreadId(10) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T03:32:29.178719Z  INFO tokio-runtime-worker ThreadId(10) ❌ Failed to execute trade for token DUSKUSDC : Price for DUSKUSDC could not be parsed or was zero
+2025-04-22T03:32:29.178851Z  INFO tokio-runtime-worker ThreadId(10) Sleeping for 3600 seconds before the next iteration...
+2025-04-22T04:00:07.234976Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T04:00:08.376690Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping AVAXUSDC — stop 18.9000, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:08.625206Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:00:08.849726Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:00:09.075278Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:00:09.529125Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SYNUSDC — stop 0.1997, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:10.013655Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0452
+2025-04-22T04:00:10.241269Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T04:00:10.698940Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0800
+2025-04-22T04:00:10.924693Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T04:00:11.379544Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for POLUSDC at 0.1926
+2025-04-22T04:00:11.607144Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T04:00:12.062364Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping CATIUSDC — stop 0.0804, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:12.514791Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:13.399049Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping ACTUSDC — stop 0.0538, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:13.852842Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping COOKIEUSDC — stop 0.0978, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:14.304264Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SHELLUSDC — stop 0.1384, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:14.774510Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping GUNUSDC — stop 0.0588, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:15.300939Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping PARTIUSDC — stop 0.1667, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:15.908073Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0291
+2025-04-22T04:00:16.135440Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T04:00:16.589296Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping BABYUSDC — stop 0.0775, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:00:17.045499Z  INFO tokio-runtime-worker ThreadId(12) 📊 TNSRUSDC market price: 0.1575, current stop: 0.1503, new stop: 0.1496
+2025-04-22T04:00:17.045683Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for TNSRUSDC — stop 0.1503 is still valid
+2025-04-22T04:00:17.497476Z  INFO tokio-runtime-worker ThreadId(12) 📊 STXUSDC market price: 0.7590, current stop: 0.7300, new stop: 0.7210
+2025-04-22T04:00:17.497653Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T04:00:17.949941Z  INFO tokio-runtime-worker ThreadId(12) 📊 RSRUSDC market price: 0.0085, current stop: 0.0081, new stop: 0.0080
+2025-04-22T04:00:17.950130Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T04:00:17.950232Z  INFO tokio-runtime-worker ThreadId(12) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T04:23:40.674434Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Starting stop-loss management loop
+2025-04-22T04:23:41.626693Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.9100, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:41.936109Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:23:42.160694Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:23:42.383512Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:23:42.962305Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SYNUSDC — stop 0.1956, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:43.577697Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0491
+2025-04-22T04:23:43.882465Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T04:23:44.500851Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for OMNIUSDC at 2.1100
+2025-04-22T04:23:44.726239Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T04:23:45.175328Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for POLUSDC at 0.1942
+2025-04-22T04:23:45.418160Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T04:23:46.036316Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping CATIUSDC — stop 0.0812, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:46.567190Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:47.021086Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping ACTUSDC — stop 0.0531, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:47.468482Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping COOKIEUSDC — stop 0.0986, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:47.920497Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SHELLUSDC — stop 0.1391, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:48.374093Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping GUNUSDC — stop 0.0550, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:49.006669Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping PARTIUSDC — stop 0.1646, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:49.517114Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0283
+2025-04-22T04:23:49.823849Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T04:23:50.358970Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping BABYUSDC — stop 0.0767, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:23:50.811172Z  INFO tokio-runtime-worker ThreadId(11) 📊 STXUSDC market price: 0.7580, current stop: 0.7300, new stop: 0.7200
+2025-04-22T04:23:50.811368Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T04:23:51.262529Z  INFO tokio-runtime-worker ThreadId(11) 📊 RSRUSDC market price: 0.0084, current stop: 0.0081, new stop: 0.0080
+2025-04-22T04:23:51.262712Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T04:23:51.711622Z  INFO tokio-runtime-worker ThreadId(11) 📊 TNSRUSDC market price: 0.1589, current stop: 0.1503, new stop: 0.1509
+2025-04-22T04:23:51.711798Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Updating stop-loss for TNSRUSDC from 0.1503 to 0.1509
+2025-04-22T04:23:52.164073Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("KNxyPNhMlzcnyainCsW9ES"), "orderId": Number(73075489), "orderListId": Number(-1), "symbol": String("TNSRUSDC"), "transactTime": Number(1745295832102)}
+2025-04-22T04:23:52.164298Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T04:49:07.656023Z  INFO tokio-runtime-worker ThreadId(12) 🔁 Starting stop-loss management loop
+2025-04-22T04:49:08.605925Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping AVAXUSDC — stop 18.8900, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:08.919128Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:49:09.217007Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:49:09.441118Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T04:49:09.897490Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping SYNUSDC — stop 0.1952, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:10.377188Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0484
+2025-04-22T04:49:10.660265Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T04:49:11.124116Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for OMNIUSDC at 2.1300
+2025-04-22T04:49:11.352736Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T04:49:11.805241Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for POLUSDC at 0.1958
+2025-04-22T04:49:12.030682Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T04:49:12.486610Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping CATIUSDC — stop 0.0813, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:12.942617Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:13.396770Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping ACTUSDC — stop 0.0530, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:13.846810Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping COOKIEUSDC — stop 0.0972, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:14.295790Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping SHELLUSDC — stop 0.1363, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:14.749242Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping GUNUSDC — stop 0.0554, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:15.203923Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping PARTIUSDC — stop 0.1654, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:15.653577Z  INFO tokio-runtime-worker ThreadId(10) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0289
+2025-04-22T04:49:15.879743Z ERROR tokio-runtime-worker ThreadId(10) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T04:49:16.336291Z  INFO tokio-runtime-worker ThreadId(10) ❌ Skipping BABYUSDC — stop 0.0757, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T04:49:16.787383Z  INFO tokio-runtime-worker ThreadId(10) 📊 RSRUSDC market price: 0.0083, current stop: 0.0081, new stop: 0.0079
+2025-04-22T04:49:16.787455Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T04:49:17.240749Z  INFO tokio-runtime-worker ThreadId(10) 📊 STXUSDC market price: 0.7500, current stop: 0.7300, new stop: 0.7120
+2025-04-22T04:49:17.240941Z  INFO tokio-runtime-worker ThreadId(10) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T04:49:17.695316Z  INFO tokio-runtime-worker ThreadId(10) 📊 TNSRUSDC market price: 0.1619, current stop: 0.1509, new stop: 0.1538
+2025-04-22T04:49:17.695505Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Updating stop-loss for TNSRUSDC from 0.1509 to 0.1538
+2025-04-22T04:49:18.149239Z  INFO tokio-runtime-worker ThreadId(10) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("Slr8nFHsdDudegkmbzmzl3"), "orderId": Number(73084761), "orderListId": Number(-1), "symbol": String("TNSRUSDC"), "transactTime": Number(1745297358075)}
+2025-04-22T04:49:18.149470Z  INFO tokio-runtime-worker ThreadId(10) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T05:17:52.433534Z  INFO tokio-runtime-worker ThreadId(11) 🔁 Starting stop-loss management loop
+2025-04-22T05:17:53.642909Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping AVAXUSDC — stop 18.7700, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:53.919074Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:17:54.142733Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:17:54.366023Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:17:54.900735Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SYNUSDC — stop 0.1931, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:55.383166Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0464
+2025-04-22T05:17:55.611217Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T05:17:56.062406Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for OMNIUSDC at 2.1000
+2025-04-22T05:17:56.304819Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T05:17:56.758910Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for POLUSDC at 0.1945
+2025-04-22T05:17:56.985158Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T05:17:57.508799Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping CATIUSDC — stop 0.0807, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:57.964260Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:58.417910Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping ACTUSDC — stop 0.0527, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:58.871041Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping COOKIEUSDC — stop 0.0959, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:59.323476Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SHELLUSDC — stop 0.1392, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:17:59.777212Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping GUNUSDC — stop 0.0530, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:18:00.232646Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping PARTIUSDC — stop 0.1644, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:18:00.684597Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0294
+2025-04-22T05:18:00.908101Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T05:18:01.360266Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping BABYUSDC — stop 0.0750, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:18:01.834488Z  INFO tokio-runtime-worker ThreadId(12) 📊 STXUSDC market price: 0.7460, current stop: 0.7300, new stop: 0.7080
+2025-04-22T05:18:01.834663Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T05:18:02.289465Z  INFO tokio-runtime-worker ThreadId(12) 📊 RSRUSDC market price: 0.0082, current stop: 0.0081, new stop: 0.0078
+2025-04-22T05:18:02.289636Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T05:18:02.755993Z  INFO tokio-runtime-worker ThreadId(12) 📊 TNSRUSDC market price: 0.1633, current stop: 0.1538, new stop: 0.1551
+2025-04-22T05:18:02.756182Z  INFO tokio-runtime-worker ThreadId(12) 🔁 Updating stop-loss for TNSRUSDC from 0.1538 to 0.1551
+2025-04-22T05:18:03.335023Z  INFO tokio-runtime-worker ThreadId(12) [2025-04-22 05:18:03] Starting market scan...    
+2025-04-22T05:18:03.348704Z  INFO tokio-runtime-worker ThreadId(11) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("jP3qkDTx94dhpqmeHrJCWB"), "orderId": Number(73097784), "orderListId": Number(-1), "symbol": String("TNSRUSDC"), "transactTime": Number(1745299083199)}
+2025-04-22T05:18:03.348857Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T05:18:03.599004Z  INFO tokio-runtime-worker ThreadId(11) 📘 Open Order: STXUSDC | Side: SELL | Qty: 14.00000000 | Price: 0.73000000 | Type: STOP_LOSS_LIMIT
+2025-04-22T05:18:03.599061Z  INFO tokio-runtime-worker ThreadId(11) 📘 Open Order: TNSRUSDC | Side: SELL | Qty: 69.20000000 | Price: 0.15510000 | Type: STOP_LOSS_LIMIT
+2025-04-22T05:18:03.599074Z  INFO tokio-runtime-worker ThreadId(11) 📘 Open Order: RSRUSDC | Side: SELL | Qty: 1204.50000000 | Price: 0.00810000 | Type: STOP_LOSS_LIMIT
+2025-04-22T05:22:37.759390Z  INFO tokio-runtime-worker ThreadId(10) ❌ Failed to execute trade for token DUSKUSDC : Price for DUSKUSDC could not be parsed or was zero
+2025-04-22T05:22:37.759637Z  INFO tokio-runtime-worker ThreadId(10) Sleeping for 3600 seconds before the next iteration...
+2025-04-22T05:51:56.967012Z  INFO tokio-runtime-worker ThreadId(10) 🔁 Starting stop-loss management loop
+2025-04-22T05:51:57.969198Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping AVAXUSDC — stop 18.8500, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:51:58.191332Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:51:58.441063Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:51:58.664673Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T05:51:59.117851Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SYNUSDC — stop 0.2004, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:51:59.572618Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0444
+2025-04-22T05:51:59.797021Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T05:52:00.249720Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TNSRUSDC — stop 0.1498, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:00.704237Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for OMNIUSDC at 2.1000
+2025-04-22T05:52:01.000010Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T05:52:01.481373Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for POLUSDC at 0.1971
+2025-04-22T05:52:01.709014Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T05:52:02.187018Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping CATIUSDC — stop 0.0805, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:02.640160Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:03.092070Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping ACTUSDC — stop 0.0527, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:03.544983Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping COOKIEUSDC — stop 0.0952, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:04.033141Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping SHELLUSDC — stop 0.1376, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:04.486099Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping GUNUSDC — stop 0.0527, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:04.939075Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping PARTIUSDC — stop 0.1654, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:05.405129Z  INFO tokio-runtime-worker ThreadId(11) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0298
+2025-04-22T05:52:05.631192Z ERROR tokio-runtime-worker ThreadId(11) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T05:52:06.084458Z  INFO tokio-runtime-worker ThreadId(11) ❌ Skipping BABYUSDC — stop 0.0735, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T05:52:06.557800Z  INFO tokio-runtime-worker ThreadId(11) 📊 STXUSDC market price: 0.7500, current stop: 0.7300, new stop: 0.7120
+2025-04-22T05:52:06.557983Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T05:52:07.048973Z  INFO tokio-runtime-worker ThreadId(11) 📊 RSRUSDC market price: 0.0083, current stop: 0.0081, new stop: 0.0079
+2025-04-22T05:52:07.049157Z  INFO tokio-runtime-worker ThreadId(11) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T05:52:07.049258Z  INFO tokio-runtime-worker ThreadId(11) ⏱ Sleeping 900 seconds before next stop-loss check
+2025-04-22T06:09:37.948693Z  INFO tokio-runtime-worker ThreadId(12) 🔁 Starting stop-loss management loop
+2025-04-22T06:09:38.989358Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping AVAXUSDC — stop 18.9800, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:39.293295Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for AXSUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T06:09:39.518823Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for NFTUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T06:09:39.745184Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to fetch price for ETHWUSDC: error decoding response body: missing field `price` at line 1 column 38
+2025-04-22T06:09:40.200267Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SYNUSDC — stop 0.1962, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:40.750289Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for PIXELUSDC at 0.0435
+2025-04-22T06:09:40.979161Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for PIXELUSDC: Failed to place stop loss limit order
+2025-04-22T06:09:41.437318Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping TNSRUSDC — stop 0.1500, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:41.889169Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for OMNIUSDC at 2.0900
+2025-04-22T06:09:42.115473Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for OMNIUSDC: Failed to place stop loss limit order
+2025-04-22T06:09:42.674945Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for POLUSDC at 0.1983
+2025-04-22T06:09:42.900461Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for POLUSDC: Failed to place stop loss limit order
+2025-04-22T06:09:43.496238Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping CATIUSDC — stop 0.0796, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:43.949270Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping TURBOUSDC — stop 0.0022, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:44.402065Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping ACTUSDC — stop 0.0524, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:44.944296Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping COOKIEUSDC — stop 0.0944, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:45.465270Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping SHELLUSDC — stop 0.1373, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:45.918974Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping GUNUSDC — stop 0.0524, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:46.456691Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping PARTIUSDC — stop 0.1627, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:46.976852Z  INFO tokio-runtime-worker ThreadId(12) 🔒 Placing initial stop-loss for MUBARAKUSDC at 0.0298
+2025-04-22T06:09:47.204064Z ERROR tokio-runtime-worker ThreadId(12) ❌ Failed to place stop-loss for MUBARAKUSDC: Failed to place stop loss limit order
+2025-04-22T06:09:47.788163Z  INFO tokio-runtime-worker ThreadId(12) ❌ Skipping BABYUSDC — stop 0.0739, qty 0.0000, notional 0.0000 do not meet filters
+2025-04-22T06:09:48.309553Z  INFO tokio-runtime-worker ThreadId(12) 📊 STXUSDC market price: 0.7520, current stop: 0.7300, new stop: 0.7140
+2025-04-22T06:09:48.309744Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for STXUSDC — stop 0.7300 is still valid
+2025-04-22T06:09:48.842038Z  INFO tokio-runtime-worker ThreadId(12) 📊 RSRUSDC market price: 0.0082, current stop: 0.0081, new stop: 0.0078
+2025-04-22T06:09:48.842170Z  INFO tokio-runtime-worker ThreadId(12) ✅ No update needed for RSRUSDC — stop 0.0081 is still valid
+2025-04-22T06:09:48.842232Z  INFO tokio-runtime-worker ThreadId(12) ⏱ Sleeping 900 seconds before next stop-loss check

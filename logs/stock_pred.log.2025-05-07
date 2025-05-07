@@ -1,0 +1,20 @@
+2025-05-07T08:55:54.514873Z  INFO main ThreadId(01) Assets to scan: ["USDC"]
+2025-05-07T08:55:54.515039Z  INFO tokio-runtime-worker ThreadId(13) [2025-05-07 08:55:54] Starting market scan...    
+2025-05-07T08:55:54.515075Z  INFO tokio-runtime-worker ThreadId(11) 🔁 [2025-05-07 08:55:54] Starting stop-loss management loop
+2025-05-07T08:55:54.781338Z  INFO tokio-runtime-worker ThreadId(02) 📘 Open Order: CETUSUSDC | Side: SELL | Qty: 51.20000000 | Price: 0.17550000 | Type: STOP_LOSS_LIMIT
+2025-05-07T08:55:54.781625Z  INFO tokio-runtime-worker ThreadId(02) 📘 Open Order: BMTUSDC | Side: SELL | Qty: 62.40000000 | Price: 0.14430000 | Type: STOP_LOSS_LIMIT
+2025-05-07T08:55:54.781747Z  INFO tokio-runtime-worker ThreadId(02) 📘 Open Order: FORMUSDC | Side: SELL | Qty: 3.70000000 | Price: 2.35630000 | Type: STOP_LOSS_LIMIT
+2025-05-07T08:55:56.146558Z  INFO tokio-runtime-worker ThreadId(12) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("4Ru1KcaMK7LrCOTSHZ7I8c"), "orderId": Number(890611329), "orderListId": Number(-1), "symbol": String("ADAUSDC"), "transactTime": Number(1746608156087)}
+2025-05-07T09:40:15.427819Z  INFO main ThreadId(01) Assets to scan: ["USDC"]
+2025-05-07T09:40:15.427977Z  INFO tokio-runtime-worker ThreadId(13) [2025-05-07 09:40:15] Starting market scan...    
+2025-05-07T09:40:15.428004Z  INFO tokio-runtime-worker ThreadId(11) 🔁 [2025-05-07 09:40:15] Starting stop-loss management loop
+2025-05-07T09:40:15.710020Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: SAGAUSDC | Side: SELL | Qty: 36.10000000 | Price: 0.24890000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710312Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: STXUSDC | Side: SELL | Qty: 11.60000000 | Price: 0.76500000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710421Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: CETUSUSDC | Side: SELL | Qty: 51.20000000 | Price: 0.17550000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710494Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: COOKIEUSDC | Side: SELL | Qty: 58.00000000 | Price: 0.15540000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710564Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: KAITOUSDC | Side: SELL | Qty: 8.50000000 | Price: 1.04220000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710631Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: BMTUSDC | Side: SELL | Qty: 62.40000000 | Price: 0.14450000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710688Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: FORMUSDC | Side: SELL | Qty: 3.70000000 | Price: 2.35630000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:15.710728Z  INFO tokio-runtime-worker ThreadId(04) 📘 Open Order: SYRUPUSDC | Side: SELL | Qty: 41.30000000 | Price: 0.21680000 | Type: STOP_LOSS_LIMIT
+2025-05-07T09:40:40.450658Z  INFO tokio-runtime-worker ThreadId(09) Sleeping for 3600 seconds before the next iteration...
+2025-05-07T09:40:40.451198Z  INFO tokio-runtime-worker ThreadId(09) ✅ STOP_LOSS_LIMIT order placed: Object {"clientOrderId": String("QG6X5QkG4SOfBcAy1M3uUx"), "orderId": Number(171973068), "orderListId": Number(-1), "symbol": String("KAITOUSDC"), "transactTime": Number(1746610823468)}

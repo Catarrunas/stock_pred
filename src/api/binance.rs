@@ -15,16 +15,15 @@ use std::collections::HashSet;
 use hex::encode as hex_encode;
 use dotenv::from_filename;
 use tracing::{info,error};
-use crate::types::OpenOrder;
-use crate::types::Order;
 use reqwest::Error;
-use crate::config::SHARED_CONFIG;
 use std::collections::HashMap;
 use tokio::time::Duration;
 use tokio::time::sleep;
 use reqwest::Error as ReqwestError;         
-use crate::types::PURCHASE_PRICES;
 use std::error::Error as StdError;      
+use crate::logging::log_trade_event;
+use crate::types::*;
+use crate::config::*;
 
 #[derive(Debug, Clone, Default)]
 pub struct SymbolFilters {
@@ -446,17 +445,10 @@ impl Binance {
 
     pub async fn execute_trade_with_fallback_stop(&self,symbol: &str, activation_price: Option<f64>,) -> Result<(), Box<dyn StdError>> {
         let quote_asset = &symbol[symbol.len() - 4..];
-        let (quote_amount, stop_loss_percent) = {
-            let config = SHARED_CONFIG.read().unwrap();
-            let i = config.quote_assets.iter().position(|a| a == quote_asset).unwrap_or(0);
-            let quote_amount = config.transaction_amounts.get(i).copied().unwrap_or(5.0);
-            let stop_loss_percent = config.stop_loss_percent;
-            (quote_amount, stop_loss_percent)
-        };
-    
+        let (quote_amount, stop_loss_percent) = get_quote_amount_and_stop_loss(quote_asset);
         // Get filters
         let filters = Binance::get_symbol_filters(self, symbol).await?;
-    
+        let trend = MARKET_TREND.read().await.clone();
         let raw_qty = self.calculate_quantity_for_quote(symbol, quote_amount).await?;
         let quantity = Binance::round_to_step(raw_qty, filters.step_size);
     
@@ -483,6 +475,7 @@ impl Binance {
         let adjusted_balance = Binance::round_to_step(confirmed_balance, filters.step_size);
     
         let current_price = self.get_price(symbol).await?;
+        log_trade_event(symbol,"BUY",current_price,adjusted_balance,current_price * adjusted_balance,current_price * (1.0 - stop_loss_percent / 100.0),"placed_initial",&trend).await;
     
         let supports_trailing = self
             .symbol_supports_order_type(symbol, "TRAILING_STOP_MARKET")
@@ -590,10 +583,7 @@ impl Binance {
     }
 
     pub async fn should_pause_for_losses(&self) -> Result<bool, Error> {
-        let max_losses = {
-            let cfg = SHARED_CONFIG.read().unwrap();
-            cfg.max_loss_day
-        };
+        let max_losses = get_max_loss_day();
 
         match self.count_today_losses().await {
             Ok(losses) => {
@@ -669,10 +659,8 @@ impl Binance {
     
         let account: AccountInfo = response.json().await?;
     
-        let excluded_assets = {
-            let cfg = crate::config::SHARED_CONFIG.read().unwrap();
-            cfg.excluded_assets_spot.clone()
-        };
+        let excluded_assets = get_excluded_assets_spot();
+
         //println!("Excluded assets: {:?}", excluded_assets);
         let threshold = 0.0001; 
         let holdings = account
@@ -734,8 +722,10 @@ impl Binance {
             }
         }
 
-        // Wait for 15 minutes
-        sleep(Duration::from_secs(15 * 60)).await;
+        let interval = get_stop_loss_loop_seconds();
+
+        println!("⏱ Sleeping {} seconds before next stop-loss check", interval);
+        sleep(Duration::from_secs(interval)).await;
     }
 }
 
@@ -786,6 +776,8 @@ impl Binance {
         if status.is_success() {
             let parsed: serde_json::Value = serde_json::from_str(&body)?;
             let order_id = parsed["orderId"].as_u64().unwrap_or(0);
+            let trend = MARKET_TREND.read().await.clone();
+            log_trade_event(symbol,"SET_STOP",stop_price,quantity,stop_price * quantity,stop_price,&format!("placed stop-loss @ {:.4}",stop_price), &trend).await;
             println!("✅ STOP_LOSS_LIMIT order placed for {}. Order ID: {}", symbol, order_id);
             info!("✅ STOP_LOSS_LIMIT order placed: {:?}", parsed);
             Ok(order_id)
@@ -799,176 +791,6 @@ impl Binance {
     }
 
     /// Periodically check held spot tokens and ensure a stop-loss is in place or updated.
-    pub async fn manage_stop_loss_limit_loop_old(&self) {
-        loop {
-            let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
-            println!("🔁 [{}] Starting stop-loss management loop", timestamp);
-            info!("🔁 Starting stop-loss management loop");
-            let balances = match self.get_spot_balances().await {
-                Ok(b) => b,
-                Err(e) => {
-                    error!("Failed to fetch balances: {}", e);
-                    println!("❌ Failed to fetch balances: {}", e);
-                    sleep(Duration::from_secs(60)).await;
-                    continue;
-                }
-            };
-    
-            let quote_assets = {
-                let cfg = SHARED_CONFIG.read().unwrap();
-                cfg.quote_assets.clone()
-            };
-    
-            let open_orders = match self.get_open_orders().await {
-                Ok(orders) => orders,
-                Err(e) => {
-                    error!("Failed to fetch full open orders: {}", e);
-                    println!("❌ Failed to fetch full open orders: {}", e);
-                    vec![]
-                }
-            };
-    
-            let trailing_stop_symbols: HashSet<String> = open_orders
-                .iter()
-                .filter(|o| o.type_field == "TRAILING_STOP_MARKET")
-                .map(|o| o.symbol.clone())
-                .collect();
-    
-            let stop_limit_symbols: HashSet<String> = open_orders
-                .iter()
-                .filter(|o| o.type_field == "STOP_LOSS_LIMIT")
-                .map(|o| o.symbol.clone())
-                .collect();
-    
-            for (asset, balance) in balances {
-                if quote_assets.contains(&asset) {
-                    continue;
-                }
-    
-                for quote in &quote_assets {
-                    let symbol = format!("{}{}", asset, quote);
-    
-                    if trailing_stop_symbols.contains(&symbol) {
-                        println!("✅ Trailing stop already active for {}", symbol);
-                        info!("✅ Trailing stop already active for {}", symbol);
-                        continue;
-                    }
-    
-                    if stop_limit_symbols.contains(&symbol) {
-                        continue;
-                    }
-    
-                    let stop_loss_percent = SHARED_CONFIG.read().unwrap().stop_loss_percent;
-    
-                    match self.get_price(&symbol).await {
-                        Ok(price) => {
-                            let filters = match Binance::get_symbol_filters(self, &symbol).await {
-                                Ok(f) => f,
-                                Err(e) => {
-                                    println!("❌ Failed to fetch filters for {}: {}", symbol, e);
-                                    continue;
-                                }
-                            };
-    
-                            let stop_price = Binance::round_to_step(price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
-                            let quantity = Binance::round_to_step(balance, filters.step_size);
-                            let notional = stop_price * quantity;
-    
-                            if quantity < 1.0 || quantity < filters.min_qty || stop_price <= 0.0 || stop_price < filters.min_price || notional < filters.min_notional {
-                                //println!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
-                                //info!("❌ Skipping {} — stop {:.4}, qty {:.4}, notional {:.4} do not meet filters", symbol, stop_price, quantity, notional);
-                                continue;
-                            }
-    
-                            println!("🔒 Placing initial stop-loss for {} at {:.4}", symbol, stop_price);
-                            info!("🔒 Placing initial stop-loss for {} at {:.4}", symbol, stop_price);
-    
-                            if let Err(e) = self.place_stop_loss_limit_order(&symbol, quantity, stop_price, stop_price).await {
-                                println!("❌ Failed to place stop-loss for {}: {}", symbol, e);
-                                error!("❌ Failed to place stop-loss for {}: {}", symbol, e);
-                            }
-                        }
-                        Err(e) => {
-                            //println!("❌ Failed to fetch price for {}: {}", symbol, e);
-                            error!("❌ Failed to fetch price for {}: {}", symbol, e);
-                        }
-                    }
-                }
-            }
-    
-            for symbol in &stop_limit_symbols {
-                if trailing_stop_symbols.contains(symbol) {
-                    continue;
-                }
-    
-                let stop_loss_percent = SHARED_CONFIG.read().unwrap().stop_loss_percent;
-    
-                match self.get_price(symbol).await {
-                    Ok(price) => {
-                        let filters = match Binance::get_symbol_filters(self, symbol).await {
-                            Ok(f) => f,
-                            Err(e) => {
-                                println!("❌ Failed to fetch filters for {}: {}", symbol, e);
-                                continue;
-                            }
-                        };
-    
-                        if let Some(existing) = open_orders.iter().find(|o| o.symbol == *symbol && o.type_field == "STOP_LOSS_LIMIT") {
-                            let existing_stop = existing.stop_price.parse::<f64>().unwrap_or(0.0);
-                            let order_qty = existing.orig_qty.parse::<f64>().unwrap_or(0.0);
-                            let quantity = Binance::round_to_step(order_qty, filters.step_size);
-                            let stop_price = Binance::round_to_step(price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
-    
-                            if quantity == 0.0 {
-                                println!("❌ Skipping update for {} — zero quantity", symbol);
-                                info!("❌ Skipping update for {} — zero quantity", symbol);
-                                continue;
-                            }
-    
-                            println!("📊 {} market price: {:.4}, current stop: {:.4}, new stop: {:.4}", symbol, price, existing_stop, stop_price);
-                            info!("📊 {} market price: {:.4}, current stop: {:.4}, new stop: {:.4}", symbol, price, existing_stop, stop_price);
-    
-                            let rounded_existing = Binance::round_to_step(existing_stop, filters.tick_size);
-                            let rounded_new = Binance::round_to_step(stop_price, filters.tick_size);
-
-                            if rounded_new > rounded_existing {
-                                println!("🔁 Updating stop-loss for {} from {:.4} to {:.4}", symbol, existing_stop, stop_price);
-                                info!("🔁 Updating stop-loss for {} from {:.4} to {:.4}", symbol, existing_stop, stop_price);
-    
-                                if let Err(e) = self.cancel_order(symbol, existing.order_id).await {
-                                    println!("❌ Failed to cancel old stop-loss for {}: {}", symbol, e);
-                                    error!("❌ Failed to cancel old stop-loss for {}: {}", symbol, e);
-                                    continue;
-                                }
-    
-                                if let Err(e) = self.place_stop_loss_limit_order(symbol, quantity, stop_price, stop_price).await {
-                                    println!("❌ Failed to update stop-loss for {}: {}", symbol, e);
-                                    error!("❌ Failed to update stop-loss for {}: {}", symbol, e);
-                                }
-                            } else {
-                                println!("✅ No update needed for {} — stop {:.4} is still valid", symbol, existing_stop);
-                                info!("✅ No update needed for {} — stop {:.4} is still valid", symbol, existing_stop);
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        println!("❌ Failed to fetch price for {}: {}", symbol, e);
-                        error!("❌ Failed to fetch price for {}: {}", symbol, e);
-                    }
-                }
-            }
-    
-            let interval = {
-                let cfg = SHARED_CONFIG.read().unwrap();
-                cfg.stop_loss_loop_seconds
-            };
-    
-            println!("⏱ Sleeping {} seconds before next stop-loss check", interval);
-            info!("⏱ Sleeping {} seconds before next stop-loss check", interval);
-            sleep(Duration::from_secs(interval)).await;
-        }
-    }
-
     pub async fn manage_stop_loss_limit_loop(&self) {
         loop {
             let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
@@ -985,10 +807,7 @@ impl Binance {
                 }
             };
     
-            let quote_assets = {
-                let cfg = SHARED_CONFIG.read().unwrap();
-                cfg.quote_assets.clone()
-            };
+            let quote_assets = get_quote_assets();
     
             let open_orders = match self.get_open_orders().await {
                 Ok(orders) => orders,
@@ -1016,7 +835,15 @@ impl Binance {
             // Clean up purchase prices for tokens no longer in open orders
             {
                 let mut purchase_prices = PURCHASE_PRICES.lock().await;
+                let prev_symbols: HashSet<String> = purchase_prices.keys().cloned().collect();
+                let trend = MARKET_TREND.read().await.clone();
+                for symbol in prev_symbols.difference(&active_symbols) {
+                    log_trade_event(symbol,"SELL",0.0,0.0,0.0,0.0,"stop_hit",&trend).await;
+                    println!("📉 Logged SELL for {} — stop order no longer active", symbol);
+                    info!("📉 Logged SELL for {} — stop order no longer active", symbol);
+                }
                 purchase_prices.retain(|symbol, _| active_symbols.contains(symbol));
+
             }
     
             // PLACE INITIAL STOP-LOSS IF NONE EXISTS
@@ -1042,7 +869,7 @@ impl Binance {
                         Err(_) => continue,
                     };
     
-                    let stop_loss_percent = SHARED_CONFIG.read().unwrap().stop_loss_percent;
+                    let stop_loss_percent = get_stop_loss_percent();
                     let stop_price = Binance::round_to_step(price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
                     let quantity = Binance::round_to_step(balance, filters.step_size);
                     let notional = stop_price * quantity;
@@ -1101,14 +928,13 @@ impl Binance {
                 };
     
                 let stop_loss_percent = {
-                    let cfg = SHARED_CONFIG.read().unwrap();
-                    if current_price >= purchase_price * 1.05 {
-                        cfg.stop_loss_percent_profit
+                    if current_price >= purchase_price * 1.055 {
+                        get_stop_loss_percent_profit()
                     } else {
-                        continue; // Don't re-update 10% stop
+                        get_stop_loss_percent()
                     }
                 };
-    
+                //trailing behaviour
                 let stop_price = Binance::round_to_step(current_price * (1.0 - stop_loss_percent / 100.0), filters.tick_size);
                 let existing_stop = order.stop_price.parse::<f64>().unwrap_or(0.0);
                 let rounded_existing = Binance::round_to_step(existing_stop, filters.tick_size);
@@ -1143,10 +969,6 @@ impl Binance {
             sleep(Duration::from_secs(interval)).await;
         }
     }
-    
-    
-    
-    
     
     pub async fn get_symbol_filters(binance: &Binance, symbol: &str) -> Result<SymbolFilters, Error> {
         let url = format!("{}/exchangeInfo?symbol={}", binance.base_url, symbol);

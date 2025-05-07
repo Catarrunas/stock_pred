@@ -24,6 +24,9 @@ pub struct Config {
     pub excluded_assets_spot: Vec<String>,
     pub min_volume: u64,
     pub stop_loss_percent_profit: f64,
+    pub trade_log_folder: String,
+    pub log_folder: String,
+    pub log_file: String,
 }
 
 impl Config {
@@ -37,7 +40,7 @@ impl Config {
             .parse::<f64>()
             .unwrap_or(100.0);
         let stop_loss_percent = env::var("STOP_LOSS_PERCENT")
-            .unwrap_or_else(|_| "5".to_string())
+            .unwrap_or_else(|_| "10".to_string())
             .parse::<f64>()
             .unwrap_or(5.0);
         let max_open_trades = env::var("MAX_OPEN_TRADES")
@@ -104,11 +107,16 @@ impl Config {
             .unwrap_or_else(|_| "500000".to_string())
             .parse()
             .unwrap_or(500000);
-        let stop_loss_percent_profit = env::var("STOP_LOSS_PERCENT_DEFAULT")
-            .unwrap_or_else(|_| "10".to_string())
+        let stop_loss_percent_profit = env::var("STOP_LOSS_PERCENT_PROFIT")
+            .unwrap_or_else(|_| "5".to_string())
             .parse::<f64>()
             .unwrap_or(10.0);
-
+        let log_file = env::var("LOG_FILE")
+            .unwrap_or_else(|_| "stock_pred.log".to_string());
+        let log_folder = env::var("LOG_FOlDER")
+            .unwrap_or_else(|_| "logs/".to_string());
+        let trade_log_folder = env::var("TRADE_LOG_FOLDER")
+            .unwrap_or_else(|_| "logs/trades".to_string());
         Config {
             transaction_amount,
             stop_loss_percent,
@@ -127,13 +135,32 @@ impl Config {
             excluded_assets_spot,
             min_volume,
             stop_loss_percent_profit,
+            trade_log_folder,
+            log_folder,
+            log_file,
         }
     }
 }
 
-/// Returns the current transaction amount.
-pub fn get_transaction_amount() -> f64 {
-    SHARED_CONFIG.read().unwrap().transaction_amount
+pub type SharedConfig = Arc<RwLock<Config>>;
+pub static SHARED_CONFIG: Lazy<SharedConfig> = Lazy::new(|| Arc::new(RwLock::new(Config::load())));
+
+/// Returns available transaction amounts.
+pub fn get_transaction_amounts() -> Vec<f64> {
+    let _ = from_filename("vars.env");
+    env::var("TRANSACTION_AMOUNTS")
+        .unwrap_or_else(|_| "10".to_string())
+        .split(',')
+        .filter_map(|s| s.trim().parse::<f64>().ok())
+        .collect()
+}
+
+pub fn get_quote_amount_and_stop_loss(quote: &str) -> (f64, f64) {
+    let config = SHARED_CONFIG.read().unwrap();
+    let i = config.quote_assets.iter().position(|a| a == quote).unwrap_or(0);
+    let quote_amount = config.transaction_amounts.get(i).copied().unwrap_or(5.0);
+    let stop_loss_percent = config.stop_loss_percent;
+    (quote_amount, stop_loss_percent)
 }
 
 /// Returns the current stop loss percent.
@@ -189,9 +216,64 @@ pub fn get_bt_stop_loss_options() -> Vec<f64> {
         .collect()
 }
 
-pub type SharedConfig = Arc<RwLock<Config>>;
+/// Returns the order update interval (in seconds).
+pub fn get_order_update_interval() -> u64 {
+    SHARED_CONFIG.read().unwrap().order_update_interval
+}
 
-pub static SHARED_CONFIG: Lazy<SharedConfig> = Lazy::new(|| Arc::new(RwLock::new(Config::load())));
+/// Returns the quote assets list.
+pub fn get_quote_assets() -> Vec<String> {
+    let _ = from_filename("vars.env");
+    env::var("QUOTE_ASSETS")
+        .unwrap_or_else(|_| "USDC".to_string())
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect()
+}
+
+/// Returns the maximum allowed daily loss.
+pub fn get_max_loss_day() -> u32 {
+    SHARED_CONFIG.read().unwrap().max_loss_day
+}
+
+/// Returns the interval for the stop-loss update loop.
+pub fn get_stop_loss_loop_seconds() -> u64 {
+    SHARED_CONFIG.read().unwrap().stop_loss_loop_seconds
+}
+
+/// Returns a list of assets excluded from spot trading.
+pub fn get_excluded_assets_spot() -> Vec<String> {
+    let _ = from_filename("vars.env");
+    env::var("EXCLUDED_ASSETS_SPOT")
+        .unwrap_or_else(|_| "".to_string())
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect()
+}
+
+
+/// Returns the minimum 24h USD volume required for an asset.
+pub fn get_min_volume() -> u64 {
+    SHARED_CONFIG.read().unwrap().min_volume
+}
+
+/// Returns the stop-loss percentage to use after reaching break-even.
+pub fn get_stop_loss_percent_profit() -> f64 {
+    SHARED_CONFIG.read().unwrap().stop_loss_percent_profit
+}
+
+pub fn get_trade_log_folder() -> String {
+    SHARED_CONFIG.read().unwrap().trade_log_folder.clone()
+}
+
+pub fn get_log_folder() -> String {
+    SHARED_CONFIG.read().unwrap().log_folder.clone()
+}
+
+pub fn get_log_file() -> String {
+    SHARED_CONFIG.read().unwrap().log_file.clone()
+}
 
 /// Spawns a file watcher that monitors "vars.env" for changes and reloads the configuration.
 pub fn watch_config(shared_config: SharedConfig) {

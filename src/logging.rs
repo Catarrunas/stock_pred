@@ -1,39 +1,39 @@
-use dotenv::from_filename;
 use std::env;
 use tracing_subscriber;
 use std::fs::{OpenOptions, create_dir_all};
 use std::io::Write;
 use chrono::Utc;
+use crate::config::*;
 
-pub fn log_trade_event(
-    symbol: &str,
-    action: &str,
-    price: f64,
-    qty: f64,
-    quote: f64,
-    stop_loss: f64,
-    reason: &str,
+
+pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quote: f64, stop_loss: f64, reason: &str, trend: &str,
 ) {
     let timestamp = Utc::now().to_rfc3339();
     let date = Utc::now().format("%Y-%m-%d").to_string();
-     // Load environment variables from vars.env.
-    let _ = from_filename("vars.env");
-     // Read log file settings from the environment.
-    let folder = env::var("TRADE_LOG_FOLDER").unwrap_or_else(|_| "trade_log".to_string());
+
+    // Read folder path from env
+    let folder = env::var("TRADE_LOG_FOLDER").unwrap_or_else(|_| "logs/trades".to_string());
     let path = format!("{}/{}.csv", folder, date);
 
+    //let mode = get_trading_mode().await;
     let row = format!(
-        "{},{},{:.4},{:.4},{:.4},{:.4},{},{}\n",
-        timestamp, symbol, action, price, qty, quote, stop_loss, reason
+        "{},{},{:.4},{:.4},{:.4},{:.4},{},{},{}\n",
+        timestamp, symbol, action, price, qty, quote, stop_loss, reason, trend
     );
-
+    
     std::thread::spawn(move || {
         if let Err(e) = create_dir_all(&folder) {
             eprintln!("❌ Failed to create log dir: {}", e);
             return;
         }
 
+        let new_file = !std::path::Path::new(&path).exists();
+
         if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) {
+            if new_file {
+                let _ = writeln!(file, "timestamp,symbol,action,price,qty,quote,stop_loss,reason,trend");
+            }
+
             if let Err(e) = file.write_all(row.as_bytes()) {
                 eprintln!("❌ Failed to write log row: {}", e);
             }
@@ -43,16 +43,15 @@ pub fn log_trade_event(
     });
 }
 
+
 /// Initialize tracing
 pub fn init_tracing(
     stdout: bool,
     filter: tracing::Level,
 ) -> tracing_appender::non_blocking::WorkerGuard {
-     // Load environment variables from vars.env.
-     let _ = from_filename("vars.env");
      // Read log file settings from the environment.
-     let log_dir = env::var("LOG_DIR").unwrap_or_else(|_| "log".to_string());
-     let log_file = env::var("LOG_FILE").unwrap_or_else(|_| "app.log".to_string());
+     let log_dir = get_log_folder();
+     let log_file = get_log_file();
 
      // Decide which output should be used
     let (writer, guard) = if stdout {

@@ -1,0 +1,2 @@
+timestamp,symbol,action,price,qty,quote,stop_loss,reason,trend
+2025-05-07T09:40:40.450849+00:00,KAITOUSDC,SET_,1.1720,8.5000,9.9620,1.1720000000000002,placed stop-loss @ 1.1720,Negative
