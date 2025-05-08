@@ -1,11 +1,14 @@
 use std::collections::{BTreeMap, HashMap};
 use std::fs::{self, File};
-use std::io::{BufRead, BufReader, Write};
-use chrono::{NaiveDateTime, Datelike};
+use std::io::{BufRead, BufReader};
+use stock_pred::config::*;
+use chrono::{Utc, Duration,Datelike,DateTime};
+use std::time::UNIX_EPOCH;
 
-#[derive(Debug)]
+
+#[derive(Debug,Clone)]
 pub struct Trade {
-    pub timestamp: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
     pub symbol: String,
     pub action: String,
     pub price: f64,
@@ -19,8 +22,8 @@ pub struct Trade {
 #[derive(Debug)]
 pub struct CompletedTrade {
     pub symbol: String,
-    pub entry_time: NaiveDateTime,
-    pub exit_time: NaiveDateTime,
+    pub entry_time: DateTime<Utc>,
+    pub exit_time: DateTime<Utc>,
     pub entry_price: f64,
     pub exit_price: f64,
     pub pnl_percent: f64,
@@ -34,7 +37,7 @@ pub fn parse_log_line(line: &str) -> Option<Trade> {
         return None;
     }
 
-    let timestamp = NaiveDateTime::parse_from_str(parts[0].trim(), "%Y-%m-%dT%H:%M:%S%.fZ").ok()?;
+    let timestamp: DateTime<Utc> = DateTime::parse_from_rfc3339(parts[0].trim()).ok()?.with_timezone(&Utc);
     let symbol = parts[1].trim().to_string();
     let action = parts[2].trim().to_string();
     let price = parts[3].trim().parse().ok()?;
@@ -137,10 +140,42 @@ pub fn print_monthly_summary(summary: &BTreeMap<String, (usize, usize, usize, f6
 }
 
 
+
+pub fn cleanup_old_trade_reports(folder: &str) {
+    let cutoff = Utc::now() - Duration::days(365);
+
+    if let Ok(entries) = fs::read_dir(folder) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+
+            // Only handle .csv files
+            if path.extension().map(|ext| ext == "csv").unwrap_or(false) {
+                if let Ok(metadata) = fs::metadata(&path) {
+                    if let Ok(modified) = metadata.modified() {
+                        if let Ok(modified_time) = modified.duration_since(UNIX_EPOCH) {
+                            let modified_date = chrono::DateTime::<Utc>::from_timestamp(modified_time.as_secs() as i64, 0)
+                            .unwrap()
+                            .naive_utc();
+                            if modified_date < cutoff.naive_utc() {
+                                if let Err(e) = fs::remove_file(&path) {
+                                    eprintln!("❌ Failed to delete {}: {}", path.display(), e);
+                                } else {
+                                    println!("🗑 Deleted old trade file: {}", path.display());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 fn main() {
     let folder = get_trade_log_folder();
     let trades = load_trades_from_dir(&folder);
     let completed = match_trades(&trades);
     let monthly = summarize_by_month(&completed);
     print_monthly_summary(&monthly);
+    //cleanup_old_trade_reports(&folder);
 }

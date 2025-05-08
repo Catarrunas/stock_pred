@@ -928,10 +928,30 @@ impl Binance {
                 };
     
                 let stop_loss_percent = {
-                    if current_price >= purchase_price * 1.055 {
-                        get_stop_loss_percent_profit()
+                    let trailing_sl_percent = get_stop_loss_percent_profit() / 100.0;  // e.g. 0.05
+                    let min_profit_lock = 0.01;  // 1% minimum profit lock
+                    let trailing_activation_threshold = 0.02; // activate after 2% gain
+                
+                    let gain = (current_price - purchase_price) / purchase_price;
+                
+                    if gain >= trailing_activation_threshold {
+                        // Calculate stop that either trails by X% or locks 1%, whichever is higher
+                        let trailing_stop_price = current_price * (1.0 - trailing_sl_percent);
+                        let locked_profit_price = purchase_price * (1.0 + min_profit_lock);
+                        let stop_price_1 = trailing_stop_price.max(locked_profit_price);
+                
+                        println!(
+                            "[{}] SL tighten triggered: {:.2}% gain → stop_price = max({:.4} [trailing], {:.4} [lock 1%]) = {:.4}",
+                            symbol,
+                            gain * 100.0,
+                            trailing_stop_price,
+                            locked_profit_price,
+                            stop_price_1
+                        );
+                        // Return stop price as % below current price, capped at locking at least 1% gain
+                        (1.0 - (stop_price_1 / current_price)) * 100.0
                     } else {
-                        get_stop_loss_percent()
+                        get_stop_loss_percent()  // already returns a percentage
                     }
                 };
                 //trailing behaviour

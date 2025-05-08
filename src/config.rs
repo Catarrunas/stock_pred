@@ -24,6 +24,7 @@ pub struct Config {
     pub excluded_assets_spot: Vec<String>,
     pub min_volume: u64,
     pub stop_loss_percent_profit: f64,
+    pub stop_loss_percent_profit_10: f64,
     pub trade_log_folder: String,
     pub log_folder: String,
     pub log_file: String,
@@ -110,7 +111,11 @@ impl Config {
         let stop_loss_percent_profit = env::var("STOP_LOSS_PERCENT_PROFIT")
             .unwrap_or_else(|_| "5".to_string())
             .parse::<f64>()
-            .unwrap_or(10.0);
+            .unwrap_or(5.0);
+        let stop_loss_percent_profit_10 = env::var("STOP_LOSS_PERCENT_PROFIT_10")
+            .unwrap_or_else(|_| "2.5".to_string())
+            .parse::<f64>()
+            .unwrap_or(3.0);
         let log_file = env::var("LOG_FILE")
             .unwrap_or_else(|_| "stock_pred.log".to_string());
         let log_folder = env::var("LOG_FOlDER")
@@ -135,6 +140,7 @@ impl Config {
             excluded_assets_spot,
             min_volume,
             stop_loss_percent_profit,
+            stop_loss_percent_profit_10,
             trade_log_folder,
             log_folder,
             log_file,
@@ -261,6 +267,10 @@ pub fn get_min_volume() -> u64 {
 /// Returns the stop-loss percentage to use after reaching break-even.
 pub fn get_stop_loss_percent_profit() -> f64 {
     SHARED_CONFIG.read().unwrap().stop_loss_percent_profit
+}
+
+pub fn get_stop_loss_percent_profit_10() -> f64 {
+    SHARED_CONFIG.read().unwrap().stop_loss_percent_profit_10
 }
 
 pub fn get_trade_log_folder() -> String {

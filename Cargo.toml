@@ -27,6 +27,10 @@ path = "neg_pred/src/neg_pred_gen.rs"
 name = "backtest"
 path = "backtest/src/backtest.rs"
 
+[[bin]]
+name = "reporting"
+path = "reporting/src/reporting.rs"
+
 [lib]
 path = "src/lib.rs"
 

@@ -2,8 +2,10 @@ use std::env;
 use tracing_subscriber;
 use std::fs::{OpenOptions, create_dir_all};
 use std::io::Write;
-use chrono::Utc;
 use crate::config::*;
+use chrono::{Duration, Utc};
+use std::time::UNIX_EPOCH;
+use std::fs;
 
 
 pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quote: f64, stop_loss: f64, reason: &str, trend: &str,
@@ -20,7 +22,7 @@ pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quot
         "{},{},{:.4},{:.4},{:.4},{:.4},{},{},{}\n",
         timestamp, symbol, action, price, qty, quote, stop_loss, reason, trend
     );
-    
+
     std::thread::spawn(move || {
         if let Err(e) = create_dir_all(&folder) {
             eprintln!("❌ Failed to create log dir: {}", e);
@@ -75,4 +77,36 @@ pub fn init_tracing(
         .init();
 
     guard
+}
+
+
+
+pub fn cleanup_old_logs(folder: &str) {
+    let cutoff = Utc::now() - Duration::days(365);
+
+    if let Ok(entries) = fs::read_dir(folder) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+
+            // Only consider .log or .txt files
+            if path.extension().map(|ext| ext == "log" || ext == "txt").unwrap_or(false) {
+                if let Ok(metadata) = fs::metadata(&path) {
+                    if let Ok(modified) = metadata.modified() {
+                        if let Ok(modified_time) = modified.duration_since(UNIX_EPOCH) {
+                            let modified_date = chrono::DateTime::<Utc>::from_timestamp(modified_time.as_secs() as i64, 0)
+                            .unwrap()
+                            .naive_utc();
+                            if modified_date < cutoff.naive_utc() {
+                                if let Err(e) = fs::remove_file(&path) {
+                                    eprintln!("❌ Failed to delete {}: {}", path.display(), e);
+                                } else {
+                                    println!("🗑 Deleted old log file: {}", path.display());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
