@@ -1,13 +1,13 @@
-use std::collections::{BTreeMap, HashMap};
-use std::fs::{self, File};
-use std::io::{BufRead, BufReader};
-use stock_pred::config::*;
-use chrono::{Utc, Duration,Datelike,DateTime};
-use std::time::UNIX_EPOCH;
+use chrono::{DateTime, Datelike, NaiveDate, Utc};
+use serde::Deserialize;
+use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
+use csv::Reader;
+use stock_pred::config::get_trade_log_folder;
 
-
-#[derive(Debug,Clone)]
-pub struct Trade {
+#[derive(Debug, Deserialize, Clone)]
+pub struct TradeLogEntry {
     pub timestamp: DateTime<Utc>,
     pub symbol: String,
     pub action: String,
@@ -15,167 +15,239 @@ pub struct Trade {
     pub qty: f64,
     pub quote: f64,
     pub stop_loss: f64,
-    pub reason: String,
-    pub trend: String,
 }
 
-#[derive(Debug)]
-pub struct CompletedTrade {
+#[derive(Debug, Default, Clone)]
+pub struct RealizedTrade {
     pub symbol: String,
-    pub entry_time: DateTime<Utc>,
-    pub exit_time: DateTime<Utc>,
-    pub entry_price: f64,
-    pub exit_price: f64,
-    pub pnl_percent: f64,
-    pub trend: String,
-    pub reason: String,
+    pub buy_price: f64,
+    pub sell_price: f64,
+    pub qty: f64,
+    pub profit: f64,
+    pub profit_pct: f64,
+    pub timestamp: DateTime<Utc>,
 }
 
-pub fn parse_log_line(line: &str) -> Option<Trade> {
-    let parts: Vec<&str> = line.split(',').collect();
-    if parts.len() < 9 || parts[0] == "timestamp" {
-        return None;
-    }
-
-    let timestamp: DateTime<Utc> = DateTime::parse_from_rfc3339(parts[0].trim()).ok()?.with_timezone(&Utc);
-    let symbol = parts[1].trim().to_string();
-    let action = parts[2].trim().to_string();
-    let price = parts[3].trim().parse().ok()?;
-    let qty = parts[4].trim().parse().ok()?;
-    let quote = parts[5].trim().parse().ok()?;
-    let stop_loss = parts[6].trim().parse().ok()?;
-    let reason = parts[7].trim().to_string();
-    let trend = parts[8].trim().to_string();
-
-    Some(Trade {
-        timestamp,
-        symbol,
-        action,
-        price,
-        qty,
-        quote,
-        stop_loss,
-        reason,
-        trend,
-    })
-}
-
-pub fn load_trades_from_dir(dir_path: &str) -> Vec<Trade> {
-    let mut trades = Vec::new();
-    if let Ok(entries) = fs::read_dir(dir_path) {
+pub fn load_trades_from_dir(folder: &Path) -> Vec<TradeLogEntry> {
+    let mut trades: Vec<TradeLogEntry> = vec![];
+    println!("📁 Scanning {:?}", folder);
+    if let Ok(entries) = fs::read_dir(folder) {
         for entry in entries.flatten() {
-            let path = entry.path();
-            if path.extension().map(|ext| ext == "csv").unwrap_or(false) {
-                if let Ok(file) = File::open(&path) {
-                    let reader = BufReader::new(file);
-                    for line in reader.lines().flatten() {
-                        if let Some(trade) = parse_log_line(&line) {
-                            trades.push(trade);
+            if entry.path().extension().map_or(false, |ext| ext == "csv") {
+                if let Ok(file) = fs::File::open(entry.path()) {
+                    let mut rdr = Reader::from_reader(file);
+                    for result in rdr.deserialize::<TradeLogEntry>() {
+                        if let Ok(entry) = result {
+                            trades.push(entry);
                         }
                     }
                 }
             }
         }
     }
+    trades.sort_by_key(|e| e.timestamp);
     trades
 }
 
-pub fn match_trades(trades: &[Trade]) -> Vec<CompletedTrade> {
-    let mut open_trades: HashMap<String, Trade> = HashMap::new();
-    let mut completed = Vec::new();
+pub fn generate_realized_report(trades: &[TradeLogEntry]) -> Vec<RealizedTrade> {
+    let mut result = vec![];
+    let mut state: HashMap<String, (Option<TradeLogEntry>, Option<TradeLogEntry>)> = HashMap::new();
 
-    for trade in trades.iter().filter(|t| t.action == "BUY" || t.action == "SELL") {
-        match trade.action.as_str() {
+    for entry in trades {
+        match entry.action.as_str() {
             "BUY" => {
-                open_trades.insert(trade.symbol.clone(), trade.clone());
+                state.insert(entry.symbol.clone(), (Some(entry.clone()), None));
+            }
+            "SET_" => {
+                if let Some((Some(buy), _)) = state.get(&entry.symbol) {
+                    if entry.timestamp > buy.timestamp {
+                        state.insert(entry.symbol.clone(), (Some(buy.clone()), Some(entry.clone())));
+                    }
+                }
             }
             "SELL" => {
-                if let Some(entry) = open_trades.remove(&trade.symbol) {
-                    let pnl_percent = (trade.price - entry.price) / entry.price * 100.0;
-                    completed.push(CompletedTrade {
-                        symbol: trade.symbol.clone(),
-                        entry_time: entry.timestamp,
-                        exit_time: trade.timestamp,
-                        entry_price: entry.price,
-                        exit_price: trade.price,
-                        pnl_percent,
-                        trend: entry.trend,
-                        reason: trade.reason.clone(),
+                if let Some((Some(buy), Some(set))) = state.get(&entry.symbol) {
+                    let sell_price = set.stop_loss;
+                    let qty = buy.qty;
+                    let profit = (sell_price - buy.price) * qty;
+                    let profit_pct = ((sell_price / buy.price) - 1.0) * 100.0;
+
+                    result.push(RealizedTrade {
+                        symbol: entry.symbol.clone(),
+                        buy_price: buy.price,
+                        sell_price,
+                        qty,
+                        profit,
+                        profit_pct,
+                        timestamp: entry.timestamp,
                     });
                 }
+                state.remove(&entry.symbol);
             }
             _ => {}
         }
     }
 
-    completed
+    result
 }
 
-pub fn summarize_by_month(completed: &[CompletedTrade]) -> BTreeMap<String, (usize, usize, usize, f64)> {
-    let mut summary = BTreeMap::new();
-
-    for trade in completed {
-        let month = format!("{}-{:02}", trade.exit_time.year(), trade.exit_time.month());
-        let entry = summary.entry(month).or_insert((0, 0, 0, 0.0));
-        entry.0 += 1;
-        if trade.pnl_percent > 0.0 {
-            entry.1 += 1;
-        } else {
-            entry.2 += 1;
-        }
-        entry.3 += trade.pnl_percent;
+pub fn summarize_by_day(trades: &[RealizedTrade]) -> HashMap<NaiveDate, (f64, f64)> {
+    let mut map = HashMap::new();
+    for trade in trades {
+        let date = trade.timestamp.date_naive();
+        let entry = map.entry(date).or_insert((0.0, 0.0));
+        entry.0 += trade.profit;
+        entry.1 += trade.qty;
     }
-
-    summary
+    map
 }
 
-pub fn print_monthly_summary(summary: &BTreeMap<String, (usize, usize, usize, f64)>) {
-    println!("{:<8} {:<6} {:<6} {:<6} {:<10}", "Month", "Total", "Wins", "Losses", "AvgPnL(%)");
-    println!("{}", "-".repeat(40));
-
-    for (month, (total, wins, losses, sum_pnl)) in summary {
-        let avg_pnl = if *total > 0 { sum_pnl / *total as f64 } else { 0.0 };
-        println!("{:<8} {:<6} {:<6} {:<6} {:<10.2}", month, total, wins, losses, avg_pnl);
+pub fn summarize_by_week(trades: &[RealizedTrade]) -> HashMap<(i32, u32), (f64, f64)> {
+    let mut map = HashMap::new();
+    for trade in trades {
+        let week = trade.timestamp.iso_week();
+        let entry = map.entry((week.year(), week.week())).or_insert((0.0, 0.0));
+        entry.0 += trade.profit;
+        entry.1 += trade.qty;
     }
+    map
 }
 
+pub fn summarize_by_month(trades: &[RealizedTrade]) -> HashMap<(i32, u32), (f64, f64)> {
+    let mut map = HashMap::new();
+    for trade in trades {
+        let key = (trade.timestamp.year(), trade.timestamp.month());
+        let entry = map.entry(key).or_insert((0.0, 0.0));
+        entry.0 += trade.profit;
+        entry.1 += trade.qty;
+    }
+    map
+}
 
+pub fn print_trades_for_symbol(symbol: &str, trades: &[TradeLogEntry]) {
+    println!("\n🔍 Realized trades for token: {}\n", symbol);
 
-pub fn cleanup_old_trade_reports(folder: &str) {
-    let cutoff = Utc::now() - Duration::days(365);
+    let mut buy: Option<&TradeLogEntry> = None;
+    let mut set: Option<&TradeLogEntry> = None;
+    let mut total_profit = 0.0;
 
-    if let Ok(entries) = fs::read_dir(folder) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-
-            // Only handle .csv files
-            if path.extension().map(|ext| ext == "csv").unwrap_or(false) {
-                if let Ok(metadata) = fs::metadata(&path) {
-                    if let Ok(modified) = metadata.modified() {
-                        if let Ok(modified_time) = modified.duration_since(UNIX_EPOCH) {
-                            let modified_date = chrono::DateTime::<Utc>::from_timestamp(modified_time.as_secs() as i64, 0)
-                            .unwrap()
-                            .naive_utc();
-                            if modified_date < cutoff.naive_utc() {
-                                if let Err(e) = fs::remove_file(&path) {
-                                    eprintln!("❌ Failed to delete {}: {}", path.display(), e);
-                                } else {
-                                    println!("🗑 Deleted old trade file: {}", path.display());
-                                }
-                            }
-                        }
+    for trade in trades.iter().filter(|t| t.symbol == symbol) {
+        match trade.action.as_str() {
+            "BUY" => {
+                buy = Some(trade);
+                set = None;
+            }
+            "SET_" => {
+                if let Some(b) = buy {
+                    if trade.timestamp > b.timestamp {
+                        set = Some(trade);
                     }
                 }
             }
+            "SELL" => {
+                if let (Some(b), Some(s)) = (buy, set) {
+                    let sell_price = s.stop_loss;
+                    let qty = b.qty;
+                    let profit = (sell_price - b.price) * qty;
+                    let profit_pct = ((sell_price / b.price) - 1.0) * 100.0;
+                    total_profit += profit;
+
+                    println!(
+                        "📅 {} → {} | 🟢 Buy @ {:.5} → Sell @ {:.5} | Qty: {:<7.4} | Profit: {:>6.2} USDC ({:+.2}%)",
+                        b.timestamp.format("%Y-%m-%d %H:%M"),
+                        trade.timestamp.format("%Y-%m-%d %H:%M"),
+                        b.price,
+                        sell_price,
+                        qty,
+                        profit,
+                        profit_pct
+                    );
+                }
+                buy = None;
+                set = None;
+            }
+            _ => {}
         }
     }
+
+    println!("\n💰 Total profit on {}: {:.2} USDC", symbol, total_profit);
 }
 
 fn main() {
     let folder = get_trade_log_folder();
-    let trades = load_trades_from_dir(&folder);
-    let completed = match_trades(&trades);
-    let monthly = summarize_by_month(&completed);
-    print_monthly_summary(&monthly);
-    //cleanup_old_trade_reports(&folder);
+    let trades = load_trades_from_dir(Path::new(&folder));
+    let realized = generate_realized_report(&trades);
+
+    println!("📊 === Realized Profit Summary ===");
+    println!("Total Realized Trades: {}", realized.len());
+
+    println!("📆 Daily Summary:");
+    for (date, (profit, _)) in summarize_by_day(&realized) {
+        println!("{} → Profit: {:.2} USDC", date, profit);
+    }
+
+    println!("📅 Weekly Summary:");
+    for ((year, week), (profit, _)) in summarize_by_week(&realized) {
+        println!("Week {}-W{:02} → Profit: {:.2} USDC", year, week, profit);
+    }
+
+    println!("🗓 Monthly Summary:");
+    for ((year, month), (profit, _)) in summarize_by_month(&realized) {
+        println!("{}-{:02} → Profit: {:.2} USDC", year, month, profit);
+    }
+
+    // Token-level profit summary
+    let mut profit_by_token = std::collections::HashMap::new();
+    for trade in &realized {
+        profit_by_token
+            .entry(trade.symbol.clone())
+            .and_modify(|p| *p += trade.profit)
+            .or_insert(trade.profit);
+    }
+
+    if let Some((best_token, best_profit)) = profit_by_token.iter().max_by(|a, b| a.1.partial_cmp(b.1).unwrap()) {
+        println!("\n🚀 Most profitable token: {} → {:.2} USDC", best_token, best_profit);
+    }
+
+    if let Some((worst_token, worst_profit)) = profit_by_token.iter().min_by(|a, b| a.1.partial_cmp(b.1).unwrap()) {
+        println!("❌ Least profitable token: {} → {:.2} USDC", worst_token, worst_profit);
+    }
+
+    let mut token_profits: HashMap<String, f64> = HashMap::new();
+
+    for trade in &realized {
+        token_profits
+            .entry(trade.symbol.clone())
+            .and_modify(|p| *p += trade.profit)
+            .or_insert(trade.profit);
+    }
+
+    let mut total_tokens = 0;
+    let mut winning_tokens = 0;
+    let mut losing_tokens = 0;
+
+    for (_token, profit) in &token_profits {
+        total_tokens += 1;
+        if *profit >= 0.0 {
+            winning_tokens += 1;
+        } else {
+            losing_tokens += 1;
+        }
+    }
+
+    if let Some((worst_token, worst_profit)) =
+        token_profits.iter().min_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+    {
+        println!("\n🔻 Token with most total loss: {} → {:.2} USDC", worst_token, worst_profit);
+    }
+
+    let win_ratio = (winning_tokens as f64 / total_tokens as f64) * 100.0;
+    let loss_ratio = (losing_tokens as f64 / total_tokens as f64) * 100.0;
+
+    println!(
+        "\n📈 Win/Loss Ratio: {:.1}% win vs {:.1}% loss ({} tokens total)",
+        win_ratio, loss_ratio, total_tokens
+    );
+
+    print_trades_for_symbol("KAITOUSDC", &trades);
 }

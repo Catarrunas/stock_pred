@@ -777,7 +777,7 @@ impl Binance {
             let parsed: serde_json::Value = serde_json::from_str(&body)?;
             let order_id = parsed["orderId"].as_u64().unwrap_or(0);
             let trend = MARKET_TREND.read().await.clone();
-            log_trade_event(symbol,"SET_STOP",stop_price,quantity,stop_price * quantity,stop_price,&format!("placed stop-loss @ {:.4}",stop_price), &trend).await;
+            log_trade_event(symbol,"SET",stop_price,quantity,stop_price * quantity,stop_price,&format!("placed stop-loss @ {:.4}",stop_price), &trend).await;
             println!("✅ STOP_LOSS_LIMIT order placed for {}. Order ID: {}", symbol, order_id);
             info!("✅ STOP_LOSS_LIMIT order placed: {:?}", parsed);
             Ok(order_id)
@@ -939,7 +939,7 @@ impl Binance {
                     if gain >= trailing_activation_threshold {
                         // Calculate stop that either trails by X% or locks 1%, whichever is higher
                         let trailing_sl_percent = if gain >= tighten_threshold {
-                            println!("[{}] 🎯 Gain {:.2} ≥ 10%, tightening SL to [{}]%", symbol, gain * 100.0,tighter_trailing_sl_percent*100);
+                            println!("[{}] 🎯 Gain {:.2} ≥ 10%, tightening SL to [{}]%", symbol, gain * 100.0,tighter_trailing_sl_percent*100.0);
                             tighter_trailing_sl_percent
                         } else {
                             base_trailing_sl_percent
