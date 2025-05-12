@@ -6,6 +6,9 @@ use tracing::{debug, info, span, Level};
 use stock_pred::config::SHARED_CONFIG;
 use stock_pred::trading::discovery::discover_signals;
 use stock_pred::types::TrendDirection;
+use stock_pred::config::is_trading_day;
+use chrono::Datelike;
+use stock_pred::config;
 
 
    
@@ -13,16 +16,12 @@ use stock_pred::types::TrendDirection;
 async fn main() {
     println!("Starting progam");
     info!("Starting progam:");
-    //sleep(Duration::from_secs(3600)).await;
-    // Initialize logging (this sets up the reloadable layer).
     let _guard = init_tracing(false, Level::INFO);
     let binance = Binance::new();
    // let mut loss_tracker = GlobalLossTracker::new(); // Initialize the loss tracker
     // Parse the list of assets from the environment variable QUOTE_ASSETS and transaction amounts from the config.
-    let (assets, transaction_amounts) = {
-        let config = SHARED_CONFIG.read().unwrap();
-        (config.quote_assets.clone(), config.transaction_amounts.clone())
-    };
+    let assets = config::get_quote_assets();
+    let transaction_amounts = config::get_transaction_amounts();
     println!("Assets to scan: {:?}", assets);
     info!("Assets to scan: {:?}", assets);
     
@@ -30,7 +29,13 @@ async fn main() {
     // Spawn the market-check loop.
     let market_check_handle = tokio::spawn(async move {
         loop {
-      /*
+            // 🛑 Check if trading is allowed today
+            if !is_trading_day() {
+                println!("⛔ Skipping trading — {} is excluded", chrono::Local::now().weekday());
+                tokio::time::sleep(Duration::from_secs(60 * 60 * 4)).await;
+                continue;
+            }
+            /*
             if loss_tracker.is_on_cooldown() {
                 println!("Bot is in global cooldown. Skipping this cycle.");
                 info!("Bot is in global cooldown. Skipping this cycle.");
@@ -50,14 +55,10 @@ async fn main() {
                 continue;
             }
          */
-            let signals = discover_signals(
-                &binance,
-                &assets,
-                &transaction_amounts,
+            let signals = discover_signals(&binance,&assets, &transaction_amounts,
                 //open_orders_clone,
                 TrendDirection::Positive,
-            )
-            .await;
+            ).await;
 
             for signal in signals {
                 println!(

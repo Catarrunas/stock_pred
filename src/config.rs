@@ -3,6 +3,8 @@ use once_cell::sync::Lazy;
 use std::env;
 use std::sync::{Arc, RwLock};
 use notify::{Watcher};
+use chrono::Local;
+use chrono::Datelike;
 
 
 #[derive(Debug, Clone)]
@@ -28,6 +30,7 @@ pub struct Config {
     pub trade_log_folder: String,
     pub log_folder: String,
     pub log_file: String,
+    pub excluded_days: Vec<String>,
 }
 
 impl Config {
@@ -99,11 +102,16 @@ impl Config {
             .parse::<u64>()
             .unwrap_or(900);
         let excluded_assets_spot = env::var("EXCLUDED_ASSETS_SPOT")
-                .unwrap_or_else(|_| "".to_string())
+            .unwrap_or_else(|_| "".to_string())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>();
+        let excluded_days = env::var("EXCLUDED_DAYS")
+                .unwrap_or_default()
                 .split(',')
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect::<Vec<_>>();
+                .map(|s| s.trim().to_ascii_lowercase())
+                .collect();
         let min_volume = env::var("MIN_VOLUME_USD")
             .unwrap_or_else(|_| "500000".to_string())
             .parse()
@@ -144,6 +152,7 @@ impl Config {
             trade_log_folder,
             log_folder,
             log_file,
+            excluded_days,
         }
     }
 }
@@ -283,6 +292,11 @@ pub fn get_log_folder() -> String {
 
 pub fn get_log_file() -> String {
     SHARED_CONFIG.read().unwrap().log_file.clone()
+}
+
+pub fn is_trading_day() -> bool {
+    let today = Local::now().weekday().to_string().to_ascii_lowercase();
+    !SHARED_CONFIG.read().unwrap().excluded_days.contains(&today)
 }
 
 /// Spawns a file watcher that monitors "vars.env" for changes and reloads the configuration.

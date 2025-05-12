@@ -448,9 +448,9 @@ impl Binance {
         let (quote_amount, stop_loss_percent) = get_quote_amount_and_stop_loss(quote_asset);
         // Get filters
         let filters = Binance::get_symbol_filters(self, symbol).await?;
-        let trend = MARKET_TREND.read().await.clone();
         let raw_qty = self.calculate_quantity_for_quote(symbol, quote_amount).await?;
         let quantity = Binance::round_to_step(raw_qty, filters.step_size);
+        let trend = MARKET_TREND.read().await.clone();
     
         if quantity < filters.min_qty {
             println!("❌ {}: Adjusted quantity {:.5} below minQty {:.5}. Skipping.", symbol, quantity, filters.min_qty);
@@ -794,6 +794,7 @@ impl Binance {
     pub async fn manage_stop_loss_limit_loop(&self) {
         loop {
             let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S");
+            let trend = MARKET_TREND.read().await.clone();
             println!("🔁 [{}] Starting stop-loss management loop", timestamp);
             info!("🔁 [{}] Starting stop-loss management loop", timestamp);
     
@@ -836,7 +837,6 @@ impl Binance {
             {
                 let mut purchase_prices = PURCHASE_PRICES.lock().await;
                 let prev_symbols: HashSet<String> = purchase_prices.keys().cloned().collect();
-                let trend = MARKET_TREND.read().await.clone();
                 for symbol in prev_symbols.difference(&active_symbols) {
                     log_trade_event(symbol,"SELL",0.0,0.0,0.0,0.0,"stop_hit",&trend).await;
                     println!("📉 Logged SELL for {} — stop order no longer active", symbol);

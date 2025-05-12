@@ -8,8 +8,7 @@ use std::time::UNIX_EPOCH;
 use std::fs;
 
 
-pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quote: f64, stop_loss: f64, reason: &str, trend: &str,
-) {
+pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quote: f64, stop_loss: f64, reason: &str, trend: &str,) {
     let timestamp = Utc::now().to_rfc3339();
     let date = Utc::now().format("%Y-%m-%d").to_string();
 
@@ -45,12 +44,8 @@ pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quot
     });
 }
 
-
 /// Initialize tracing
-pub fn init_tracing(
-    stdout: bool,
-    filter: tracing::Level,
-) -> tracing_appender::non_blocking::WorkerGuard {
+pub fn init_tracing( stdout: bool,  filter: tracing::Level,) -> tracing_appender::non_blocking::WorkerGuard {
      // Read log file settings from the environment.
      let log_dir = get_log_folder();
      let log_file = get_log_file();
@@ -78,8 +73,6 @@ pub fn init_tracing(
 
     guard
 }
-
-
 
 pub fn cleanup_old_logs(folder: &str) {
     let cutoff = Utc::now() - Duration::days(365);
