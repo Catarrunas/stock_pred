@@ -6,6 +6,7 @@ use std::path::Path;
 use csv::Reader;
 use stock_pred::config::get_trade_log_folder;
 use itertools::Itertools;
+use chrono::Timelike;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct TradeLogEntry {
@@ -194,6 +195,122 @@ fn print_grouped_summary<F, K>(trades: &[RealizedTrade], key_fn: F)   where F: F
         }
 }
 
+pub fn compute_global_win_loss_averages(trades: &[RealizedTrade]) {
+    let mut win_total = 0.0;
+    let mut win_count = 0;
+    let mut loss_total = 0.0;
+    let mut loss_count = 0;
+
+    for trade in trades {
+        if trade.profit >= 0.0 {
+            win_total += trade.profit;
+            win_count += 1;
+        } else {
+            loss_total += trade.profit;
+            loss_count += 1;
+        }
+    }
+
+    let avg_win = if win_count > 0 { win_total / win_count as f64 } else { 0.0 };
+    let avg_loss = if loss_count > 0 { loss_total / loss_count as f64 } else { 0.0 };
+    let win_rate = if (win_count + loss_count) > 0 {
+        win_count as f64 / (win_count + loss_count) as f64 * 100.0
+    } else {
+        0.0
+    };
+
+    println!("\n-------------------------------------------------------------------------:");
+    println!("📊 Global Profit Metrics:");
+    println!("🔹 Average Win:  {:.2} USDC ({} wins)", avg_win, win_count);
+    println!("🔸 Average Loss: {:.2} USDC ({} losses)", avg_loss, loss_count);
+    println!("📈 Win Rate:     {:.1}% → {}/{}", win_rate, win_count, trades.len());
+}
+
+pub fn analyze_hourly_trade_performance(trades: &[RealizedTrade]) {
+    let mut hourly_stats: HashMap<u32, Vec<&RealizedTrade>> = HashMap::new();
+
+    for trade in trades {
+        let hour = trade.timestamp.hour();
+        hourly_stats.entry(hour).or_default().push(trade);
+    }
+
+    println!("\n⏰ Hourly Trade Performance (based on SELL time):");
+    println!("{:<5} {:>6} {:>6} {:>8} {:>10}", "Hour", "Trades", "Wins", "Avg PnL", "Win Rate");
+    println!("{:-<42}", "");
+
+    for hour in 0..24 {
+        let trades = hourly_stats.get(&hour).cloned().unwrap_or_default();
+        if trades.is_empty() {
+            continue;
+        }
+
+        let total = trades.len();
+        let wins = trades.iter().filter(|t| t.profit >= 0.0).count();
+        let total_profit: f64 = trades.iter().map(|t| t.profit).sum();
+        let avg_profit = total_profit / total as f64;
+        let win_rate = wins as f64 / total as f64 * 100.0;
+
+        let color = if avg_profit >= 0.0 { "\x1b[32m" } else { "\x1b[31m" };
+        let reset = "\x1b[0m";
+
+        println!(
+            "{:<5} {:>6} {:>6} {:>8.2} {}{:>8.1}%{}",
+            format!("{:02}:00", hour),
+            total,
+            wins,
+            avg_profit,
+            color,
+            win_rate,
+            reset
+        );
+    }
+}
+
+pub fn find_underperforming_tokens_against_thresholds(trades: &[RealizedTrade], profit_threshold: f64, win_rate_threshold: f64,) {
+    use std::collections::HashMap;
+
+    println!(
+        "\n📉 Tokens underperforming (Win Rate < {:.1}%, Avg Profit < {:.2}):",
+        win_rate_threshold * 100.0,
+        profit_threshold
+    );
+
+    let mut grouped: HashMap<String, Vec<&RealizedTrade>> = HashMap::new();
+    for trade in trades {
+        grouped.entry(trade.symbol.clone()).or_default().push(trade);
+    }
+
+    let mut losers = vec![];
+
+    for (symbol, group) in grouped {
+        let total = group.len();
+        if total < 5 {
+            continue; // skip low sample size
+        }
+
+        let wins = group.iter().filter(|t| t.profit >= 0.0).count();
+        let avg_profit = group.iter().map(|t| t.profit).sum::<f64>() / total as f64;
+        let win_rate = wins as f64 / total as f64;
+
+        if win_rate < win_rate_threshold && avg_profit < profit_threshold {
+            losers.push((symbol, win_rate * 100.0, avg_profit, total));
+        }
+    }
+
+    if losers.is_empty() {
+        println!("✅ No underperforming tokens found.");
+    } else {
+        losers.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
+
+        for (symbol, win_rate, avg_profit, count) in losers {
+            println!(
+                "{} → Trades: {:>3} | Win Rate: {:>5.1}% | Avg Profit: {:>6.2} USDC",
+                symbol, count, win_rate, avg_profit
+            );
+        }
+    }
+}
+
 fn main() {
     let folder = get_trade_log_folder();
     let trades = load_trades_from_dir(Path::new(&folder));
@@ -203,17 +320,35 @@ fn main() {
 
     let args: Vec<String> = std::env::args().collect();
 
-    if args.len() == 2 && (args[1] == "help" || args[1] == "-h") {
+    if args.len() == 2 && (args[1] == "help" || args[1] == "h") {
         println!(
             "📘 Reporting CLI Usage:\n\n  \
             reporting                  → Full report (daily/weekly/monthly + summaries)\n  \
             reporting SYMBOL           → Show detailed trades for a specific token (e.g. APEUSDC)\n  \
             reporting day YYYY-MM-DD   → Show closed trades for a specific day\n  \
             reporting negative         → Show tokens with negative profit \n  \
+            reporting underperforming PROFIT WINRATE  → Show hourly trade performance (based on SELL time) \n  \
+            reporting times            → Show tokens with average profit < PROFIT and win rate < WINRATE\n\n  \
             reporting help | h         → Show this help message"
         );
         return;
     }
+
+    if args.get(1).map(|s| s.to_lowercase()) == Some("times".to_string()) {
+        analyze_hourly_trade_performance(&realized);
+        std::process::exit(0);
+    }
+
+    if args.get(1).map(|s| s.to_lowercase()) == Some("underperforming".to_string()) {
+    let profit_threshold = args.get(2).and_then(|s| s.parse::<f64>().ok()).unwrap_or(0.0);
+    let win_rate_threshold = args
+        .get(3)
+        .and_then(|s| s.parse::<f64>().ok())
+        .unwrap_or(0.4); // 40% by default
+
+    find_underperforming_tokens_against_thresholds(&realized, profit_threshold, win_rate_threshold);
+    std::process::exit(0);
+}
 
     if args.get(1).map(String::as_str) == Some("day") {
         if let Some(date_str) = args.get(2) {
@@ -354,20 +489,8 @@ fn main() {
     let win_ratio = (winning as f64 / total_tokens as f64) * 100.0;
     let loss_ratio = 100.0 - win_ratio;
 
-    println!("\n📈 Token win/loss ratio: {:.1}% win vs {:.1}% loss ({} tokens)", win_ratio, loss_ratio, total_tokens);
+    println!("\n📈 Token win/loss ratio: {:.1}% win vs {:.1}% loss ({} unique tokens)", win_ratio, loss_ratio, total_tokens);
 
-    let mut stats = std::collections::HashMap::new();
-    for trade in &realized {
-        let trend = if trade.trend.eq_ignore_ascii_case("positive") {"Positive"} else {"Negative"};
-        let entry = stats.entry(trend).or_insert((0, 0)); // (wins, total)
-        if trade.profit >= 0.0 {
-            entry.0 += 1; // win
-        }
-        entry.1 += 1; // total
-    }
-
-    for (trend, (wins, total)) in stats {
-        let win_pct = (wins as f64 / total as f64) * 100.0;
-        println!("📈 Trend: {} → {}/{} wins ({:.1}%)", trend, wins, total, win_pct);
-    }
+    compute_global_win_loss_averages(&realized);
+    analyze_hourly_trade_performance(&realized);
 }
