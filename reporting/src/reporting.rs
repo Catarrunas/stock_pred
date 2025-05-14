@@ -60,7 +60,7 @@ pub fn generate_realized_report(trades: &[TradeLogEntry]) -> Vec<RealizedTrade> 
             "BUY" => {
                 state.insert(entry.symbol.clone(), (Some(entry.clone()), None));
             }
-            "SET_" => {
+            "SET_" | "SET"  => {
                 if let Some((Some(buy), _)) = state.get(&entry.symbol) {
                     if entry.timestamp > buy.timestamp {
                         state.insert(entry.symbol.clone(), (Some(buy.clone()), Some(entry.clone())));
@@ -140,7 +140,7 @@ pub fn print_trades_for_symbol(symbol: &str, trades: &[TradeLogEntry]) {
                 buy = Some(trade);
                 set = None;
             }
-            "SET_" => {
+            "SET_" | "SET" => {
                 if let Some(b) = buy {
                     if trade.timestamp > b.timestamp {
                         set = Some(trade);
@@ -217,9 +217,6 @@ fn main() {
     if args.get(1).map(String::as_str) == Some("day") {
         if let Some(date_str) = args.get(2) {
             if let Ok(date) = chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
-                let folder = get_trade_log_folder();
-                let trades = load_trades_from_dir(Path::new(&folder));
-                let realized = generate_realized_report(&trades);
                 let day_trades: Vec<_> = realized
                     .into_iter()
                     .filter(|t| t.timestamp.date_naive() == date)
@@ -298,6 +295,30 @@ fn main() {
 
     if let Some((worst_token, worst_profit)) = profit_by_token.iter().min_by(|a, b| a.1.partial_cmp(b.1).unwrap()) {
         println!("❌ Least profitable token: {} → {:.2} USDC", worst_token, worst_profit);
+    }
+
+    if let Some(best) = realized.iter().max_by(|a, b| a.profit_pct.partial_cmp(&b.profit_pct).unwrap_or(std::cmp::Ordering::Equal)) {
+    println!(
+        "\n🏆 Best Trade: {} → {:.2}% | Buy @ {:.5} → Sell @ {:.5} | Qty: {:.4} | Date: {}",
+        best.symbol,
+        best.profit_pct,
+        best.buy_price,
+        best.sell_price,
+        best.qty,
+        best.timestamp.format("%Y-%m-%d %H:%M")
+    );
+    }
+
+    if let Some(worst) = realized.iter().min_by(|a, b| a.profit_pct.partial_cmp(&b.profit_pct).unwrap_or(std::cmp::Ordering::Equal)) {
+        println!(
+            "🔻 Worst Trade: {} → {:.2}% | Buy @ {:.5} → Sell @ {:.5} | Qty: {:.4} | Date: {}",
+            worst.symbol,
+            worst.profit_pct,
+            worst.buy_price,
+            worst.sell_price,
+            worst.qty,
+            worst.timestamp.format("%Y-%m-%d %H:%M")
+        );
     }
 
     let total_tokens = profit_by_token.len();

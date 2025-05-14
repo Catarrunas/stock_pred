@@ -37,6 +37,8 @@ pub async fn log_trade_event(symbol: &str,action: &str,price: f64,qty: f64, quot
 
             if let Err(e) = file.write_all(row.as_bytes()) {
                 eprintln!("❌ Failed to write log row: {}", e);
+            } else if let Err(e) = file.flush() {
+                eprintln!("❌ Failed to flush log file: {}", e);
             }
         } else {
             eprintln!("❌ Could not open log file: {}", path);

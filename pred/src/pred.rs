@@ -9,6 +9,7 @@ use stock_pred::types::TrendDirection;
 use stock_pred::config::is_trading_day;
 use chrono::Datelike;
 use stock_pred::config;
+use stock_pred::config::watch_config;
 
 
    
@@ -17,6 +18,7 @@ async fn main() {
     println!("Starting progam");
     info!("Starting progam:");
     let _guard = init_tracing(false, Level::INFO);
+    watch_config(SHARED_CONFIG.clone());
     let binance = Binance::new();
    // let mut loss_tracker = GlobalLossTracker::new(); // Initialize the loss tracker
     // Parse the list of assets from the environment variable QUOTE_ASSETS and transaction amounts from the config.
@@ -85,10 +87,7 @@ async fn main() {
             
             // Extract values from the shared config
             // Extract values and drop the guard immediately:
-            let loop_time = {
-                let current_config = SHARED_CONFIG.read().unwrap();
-                current_config.loop_time_seconds
-            };
+            let loop_time = config::get_loop_time_seconds();
             println!("-------------------------------------------------------------------------");
             println!("Sleeping for {} seconds before the next iteration...", loop_time);
             info!("Sleeping for {} seconds before the next iteration...", loop_time);

@@ -9,7 +9,6 @@ use chrono::Datelike;
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub transaction_amount: f64,
     pub stop_loss_percent: f64,
     pub max_open_trades: usize,
     pub lookback_period: u16,
@@ -31,6 +30,7 @@ pub struct Config {
     pub log_folder: String,
     pub log_file: String,
     pub excluded_days: Vec<String>,
+    pub excluded_tokens: Vec<String>,
 }
 
 impl Config {
@@ -39,10 +39,6 @@ impl Config {
         // Load the environment variables from vars.env.
         let _ = from_filename("vars.env");
 
-        let transaction_amount = env::var("TRANSACTION_AMOUNT")
-            .unwrap_or_else(|_| "100".to_string())
-            .parse::<f64>()
-            .unwrap_or(100.0);
         let stop_loss_percent = env::var("STOP_LOSS_PERCENT")
             .unwrap_or_else(|_| "10".to_string())
             .parse::<f64>()
@@ -108,10 +104,16 @@ impl Config {
             .filter(|s| !s.is_empty())
             .collect::<Vec<_>>();
         let excluded_days = env::var("EXCLUDED_DAYS")
-                .unwrap_or_default()
-                .split(',')
-                .map(|s| s.trim().to_ascii_lowercase())
-                .collect();
+            .unwrap_or_default()
+            .split(',')
+            .map(|s| s.trim().to_ascii_lowercase())
+            .collect();
+        let excluded_tokens = env::var("EXCLUDED_TOKENS")
+            .unwrap_or_else(|_| "".to_string())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>();
         let min_volume = env::var("MIN_VOLUME_USD")
             .unwrap_or_else(|_| "500000".to_string())
             .parse()
@@ -131,7 +133,6 @@ impl Config {
         let trade_log_folder = env::var("TRADE_LOG_FOLDER")
             .unwrap_or_else(|_| "logs/trades".to_string());
         Config {
-            transaction_amount,
             stop_loss_percent,
             max_open_trades,
             lookback_period,
@@ -153,6 +154,7 @@ impl Config {
             log_folder,
             log_file,
             excluded_days,
+            excluded_tokens,
         }
     }
 }
@@ -267,6 +269,16 @@ pub fn get_excluded_assets_spot() -> Vec<String> {
         .collect()
 }
 
+/// Returns a list of assets excluded from spot trading.s
+pub fn get_excluded_tokens() -> Vec<String> {
+    let _ = from_filename("vars.env");
+    env::var("EXCLUDED_TOKENS")
+        .unwrap_or_else(|_| "".to_string())
+        .split(',')
+        .map(|s| s.trim().to_uppercase())
+        .filter(|s| !s.is_empty())
+        .collect()
+}
 
 /// Returns the minimum 24h USD volume required for an asset.
 pub fn get_min_volume() -> u64 {
@@ -320,13 +332,11 @@ pub fn watch_config(shared_config: SharedConfig) {
             match rx.recv() {
                 Ok(event) => {
                     println!("Configuration file changed. Reloading... Event: {:?}", event);
-                    // Remove the environment variable so dotenv can load a new value.
-                    std::env::remove_var("LOOP_TIME_SECONDS");
                     // Reload the configuration.
                     let new_config = Config::load();
                     if let Ok(mut config) = shared_config.write() {
                         *config = new_config;
-                        println!("New configuration: {:?}", *config);
+                        //println!("New configuration: {:?}", *config);
                     }
                     // Throttle rapid events.
                     std::thread::sleep(std::time::Duration::from_millis(200));

@@ -1,5 +1,4 @@
 use crate::types::{Signal, TrendDirection};
-use crate::config::SHARED_CONFIG;
 use chrono::Utc;
 use std::time::Duration;
 use tokio::time::sleep;
@@ -8,6 +7,7 @@ use log::{info, error};
 use crate::api::binance::Binance;
 use std::collections::HashSet;
 use crate::types::MARKET_TREND;
+use crate::config;
 
 pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_amounts: &[f64], trend: TrendDirection,) -> Vec<Signal> {
     let mut signals = Vec::new();
@@ -76,19 +76,21 @@ pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_
     }
     */
 
-    let min_volume = {
-        let cfg = SHARED_CONFIG.read().unwrap();
-        cfg.min_volume as f64
-    };
-
+    let min_volume = config::get_min_volume() as f64;
+    let excluded_tokens = config::get_excluded_tokens();
 
     let tradable_tokens: Vec<(String, f64)> = all_tickers
         .into_iter()
         .filter_map(|ticker| {
             let volume = ticker.quote_volume.parse::<f64>().unwrap_or(0.0);
+            let symbol = ticker.symbol.to_uppercase();
+
             ticker.priceChangePercent.parse::<f64>().ok().and_then(|change| {
-                if volume >= min_volume && !invested_tokens.contains(&ticker.symbol) {
-                    Some((ticker.symbol, change))
+                if volume >= min_volume
+                    && !invested_tokens.contains(&ticker.symbol)
+                    && !excluded_tokens.contains(&ticker.symbol)
+                {
+                    Some((symbol, change))
                 } else {
                     None
                 }
@@ -105,19 +107,12 @@ pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_
             }
         };
 
-        let amount = transaction_amounts.get(i).copied().unwrap_or_else(|| {
-            let config = SHARED_CONFIG.read().unwrap();
-            config.transaction_amount
-        });
-
-        if balance < amount {
+        if balance < transaction_amounts.get(i).copied().unwrap_or(10.0) {
             continue;
-        }
+        }   
 
-        let (lookback, recent) = {
-            let config = SHARED_CONFIG.read().unwrap();
-            (config.lookback_period, config.last_hours_period)
-        };
+        let lookback = config::get_lookback_period();
+        let recent = config::get_last_hours_period();
 
         let candidates: Vec<String> = tradable_tokens
             .iter()
@@ -140,6 +135,8 @@ pub async fn discover_signals(binance: &Binance, assets: &[String], transaction_
             }
 
             */
+            
+
 
             match binance.get_klines(&symbol, "1h", lookback).await {
                 Ok(klines) => {

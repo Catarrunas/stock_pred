@@ -24,6 +24,7 @@ use std::error::Error as StdError;
 use crate::logging::log_trade_event;
 use crate::types::*;
 use crate::config::*;
+use crate::config;
 
 #[derive(Debug, Clone, Default)]
 pub struct SymbolFilters {
@@ -464,7 +465,7 @@ impl Binance {
         info!("📈 Executing market buy for {} with {:.6} units ({} quote)", symbol, quantity, quote_amount);
     
         // Wait briefly to ensure balance is updated on Binance's end
-       // 1. Place market buy
+        // 1. Place market buy
         let _buy_order_id = self.place_market_buy_order(symbol, quantity).await?;
 
         // 2. Wait briefly for wallet to update
@@ -988,12 +989,9 @@ impl Binance {
                 }
             }
     
-            let interval = {
-                let cfg = SHARED_CONFIG.read().unwrap();
-                cfg.stop_loss_loop_seconds
-            };
-    
+            let interval = config::get_stop_loss_loop_seconds();
             println!("⏱ Sleeping {} seconds before next stop-loss check", interval);
+            println!("-------------------------------------------------------------------------");
             sleep(Duration::from_secs(interval)).await;
         }
     }
@@ -1039,8 +1037,23 @@ impl Binance {
         })
     }
     
-    pub fn round_to_step(value: f64, step: f64) -> f64 {
+    pub fn round_to_step_old(value: f64, step: f64) -> f64 {
         (value / step).floor() * step
+    }
+
+    pub fn round_to_step(value: f64, step: f64) -> f64 {
+        let precision = Self::num_decimal_places(step);
+        let scaled = (value / step).floor() * step;
+        (scaled * 10_f64.powi(precision as i32)).round() / 10_f64.powi(precision as i32)
+    }   
+
+    fn num_decimal_places(step: f64) -> u32 {
+        let step_str = format!("{:.20}", step); // avoid scientific notation
+        step_str.trim_end_matches('0')
+            .split('.')
+            .nth(1)
+            .map(|dec| dec.len())
+            .unwrap_or(0) as u32
     }
 
     pub async fn get_open_orders(&self) -> Result<Vec<OpenOrder>, Error> {
