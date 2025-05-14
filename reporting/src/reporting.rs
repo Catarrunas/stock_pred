@@ -209,7 +209,8 @@ fn main() {
             reporting                  → Full report (daily/weekly/monthly + summaries)\n  \
             reporting SYMBOL           → Show detailed trades for a specific token (e.g. APEUSDC)\n  \
             reporting day YYYY-MM-DD   → Show closed trades for a specific day\n  \
-            reporting help | h      → Show this help message"
+            reporting negative         → Show tokens with negative profit \n  \
+            reporting help | h         → Show this help message"
         );
         return;
     }
@@ -255,6 +256,33 @@ fn main() {
                 std::process::exit(1);
             }
         }
+    }
+    if args.get(1).map(|s| s.to_lowercase()) == Some("negative".to_string()) {
+        let mut profit_by_token = std::collections::HashMap::new();
+        for trade in &realized {
+            profit_by_token
+                .entry(trade.symbol.clone())
+                .and_modify(|p| *p += trade.profit)
+                .or_insert(trade.profit);
+        }
+
+        let mut losses: Vec<_> = profit_by_token
+            .iter()
+            .filter(|(_, profit)| **profit < 0.0)
+            .collect();
+
+        losses.sort_by(|a, b| a.1.partial_cmp(b.1).unwrap()); // sort by profit (ascending: worst first)
+
+        println!("\n📉 Tokens with net negative profit:");
+        if losses.is_empty() {
+            println!("✅ No losing tokens!");
+        } else {
+            for (symbol, profit) in losses {
+                println!("{} → {:.2} USDC", symbol, profit);
+            }
+        }
+
+        std::process::exit(0);
     }
 
     if let Some(symbol) = symbol_filter {
